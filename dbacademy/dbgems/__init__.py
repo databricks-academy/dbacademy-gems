@@ -3,29 +3,20 @@ from requests.sessions import default_headers
 from pyspark import SparkContext
 from pyspark.sql import SparkSession
 
-sc, spark, dbutils = init_locals()
+try: spark
+except NameError:spark = SparkSession.builder.getOrCreate()
 
-def init_locals():
+try: sc
+except NameError: sc = spark.sparkContext
 
-    # noinspection PyGlobalUndefined
-    global spark, sc, dbutils
-
-    try: spark
-    except NameError:spark = SparkSession.builder.getOrCreate()
-
-    try: sc
-    except NameError: sc = spark.sparkContext
-
-    try: dbutils
-    except NameError:
-        if spark.conf.get("spark.databricks.service.client.enabled") == "true":
-            from pyspark.dbutils import DBUtils
-            dbutils = DBUtils(spark)
-        else:
-            import IPython
-            dbutils = IPython.get_ipython().user_ns["dbutils"]
-
-    return sc, spark, dbutils
+try: dbutils
+except NameError:
+    if spark.conf.get("spark.databricks.service.client.enabled") == "true":
+        from pyspark.dbutils import DBUtils
+        dbutils = DBUtils(spark)
+    else:
+        import IPython
+        dbutils = IPython.get_ipython().user_ns["dbutils"]
 
 def get_parameter(name, default_value=""):
     try: return str(dbutils.widgets.get(name))
