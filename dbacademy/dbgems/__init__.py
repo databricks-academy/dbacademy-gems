@@ -3,6 +3,7 @@ from requests.sessions import default_headers
 from pyspark import SparkContext
 from pyspark.sql import SparkSession
 
+sc, spark, dbutils = init_locals()
 
 def init_locals():
 
@@ -25,9 +26,6 @@ def init_locals():
             dbutils = IPython.get_ipython().user_ns["dbutils"]
 
     return sc, spark, dbutils
-
-
-sc, spark, dbutils = init_locals()
 
 def get_parameter(name, default_value=""):
     try: return str(dbutils.widgets.get(name))
@@ -58,12 +56,10 @@ def get_cloud():
 
     raise Exception("Unable to identify the cloud provider.")
 
-
 def get_tags() -> dict:
     # noinspection PyProtectedMember
     return sc._jvm.scala.collection.JavaConversions.mapAsJavaMap(
         dbutils.entry_point.getDbutils().notebook().getContext().tags())
-
 
 def get_tag(tag_name: str, default_value: str = None) -> str:
     values = get_tags()[tag_name]
@@ -96,7 +92,6 @@ def get_notebook_dir(offset=-1) -> str:
 
 def get_notebooks_api_endpoint() -> str:
     return dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiUrl().getOrElse(None)
-
 
 def get_notebooks_api_token() -> str:
     return dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiToken().getOrElse(None)
