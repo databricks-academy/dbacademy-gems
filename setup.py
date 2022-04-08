@@ -5,5 +5,6 @@ from setuptools import find_packages
 setuptools.setup(
     name="dbacademy-gems",
     version="0.1",
-    packages=["dbacademy"],
+    packages=['dbacademy'],
+    package_dir={"dbacademy": "./dbacademy"},
 )
