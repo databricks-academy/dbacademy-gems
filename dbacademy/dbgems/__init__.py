@@ -53,12 +53,7 @@ def get_tags() -> dict:
         dbutils.entry_point.getDbutils().notebook().getContext().tags())
 
 def get_tag(tag_name: str, default_value: str = None) -> str:
-    values = get_tags()[tag_name]
-    try:
-        if len(values) > 0:
-            return values
-    except KeyError:
-        return default_value
+    return get_tags().get(tag_name, default_value)
 
 def get_username() -> str:
     return get_tags()["user"]
