@@ -18,9 +18,11 @@ except NameError:
         import IPython
         dbutils = IPython.get_ipython().user_ns["dbutils"]
 
+
 def get_parameter(name, default_value=""):
     try: return str(dbutils.widgets.get(name))
     except: return default_value
+
 
 def get_current_spark_version():
     from dbacademy import dbrest
@@ -29,11 +31,18 @@ def get_current_spark_version():
     cluster = client.clusters().get(cluster_id)
     return cluster.get("spark_version", None)
 
+
 def get_current_instance_pool_id(client):
     cluster_id = get_tags()["clusterId"]
     cluster = client.clusters().get(cluster_id)
-    # return cluster["instance_pool_id"] if "instance_pool_id" in cluster else None
     return cluster.get("instance_pool_id", None)
+
+
+def get_current_node_type_id(client):
+    cluster_id = get_tags()["clusterId"]
+    cluster = client.clusters().get(cluster_id)
+    return cluster.get("node_type_id", None)
+
 
 def get_cloud():
     with open("/databricks/common/conf/deploy.conf") as f:
@@ -47,22 +56,28 @@ def get_cloud():
 
     raise Exception("Unable to identify the cloud provider.")
 
+
 def get_tags() -> dict:
     # noinspection PyProtectedMember
     return sc._jvm.scala.collection.JavaConversions.mapAsJavaMap(
         dbutils.entry_point.getDbutils().notebook().getContext().tags())
 
+
 def get_tag(tag_name: str, default_value: str = None) -> str:
     return get_tags().get(tag_name, default_value)
+
 
 def get_username() -> str:
     return get_tags()["user"]
 
+
 def get_browser_host_name():
     return get_tags()["browserHostName"]
 
+
 def get_workspace_id() -> str:
     return dbutils.entry_point.getDbutils().notebook().getContext().workspaceId().getOrElse(None)
+
 
 def get_notebook_path() -> str:
     return dbutils.entry_point.getDbutils().notebook().getContext().notebookPath().getOrElse(None)
@@ -78,6 +93,7 @@ def get_notebook_dir(offset=-1) -> str:
 
 def get_notebooks_api_endpoint() -> str:
     return dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiUrl().getOrElse(None)
+
 
 def get_notebooks_api_token() -> str:
     return dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiToken().getOrElse(None)
