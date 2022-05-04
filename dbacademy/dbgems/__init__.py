@@ -24,22 +24,39 @@ def get_parameter(name, default_value=""):
     except: return default_value
 
 
-def get_current_spark_version():
+def get_current_spark_version(client=None):
+    print("*" * 80)
+    print("* DEPRECATION WARNING")
+    print("* dbacademy.dbrest.clusters().get_current_spark_version() instead")
+    print("*" * 80)
+
     from dbacademy import dbrest
     cluster_id = get_tags()["clusterId"]
-    client = dbrest.DBAcademyRestClient()
+    client = dbrest.DBAcademyRestClient() if client is None else client
     cluster = client.clusters().get(cluster_id)
     return cluster.get("spark_version", None)
 
 
-def get_current_instance_pool_id(client):
+def get_current_instance_pool_id(client=None):
+    print("*" * 80)
+    print("* DEPRECATION WARNING")
+    print("* dbacademy.dbrest.clusters().get_current_instance_pool_id() instead")
+    print("*" * 80)
+
     cluster_id = get_tags()["clusterId"]
+    client = dbrest.DBAcademyRestClient() if client is None else client
     cluster = client.clusters().get(cluster_id)
     return cluster.get("instance_pool_id", None)
 
 
-def get_current_node_type_id(client):
+def get_current_node_type_id(client=None):
+    print("*" * 80)
+    print("* DEPRECATION WARNING")
+    print("* dbacademy.dbrest.clusters().get_current_node_type_id() instead")
+    print("*" * 80)
+
     cluster_id = get_tags()["clusterId"]
+    client = dbrest.DBAcademyRestClient() if client is None else client
     cluster = client.clusters().get(cluster_id)
     return cluster.get("node_type_id", None)
 
