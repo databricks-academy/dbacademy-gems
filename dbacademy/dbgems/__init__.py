@@ -114,6 +114,16 @@ def get_browser_host_name():
     return get_tags()["browserHostName"]
 
 
+def get_job_id():
+    __init()
+    return get_tags()["jobId"]
+
+
+def is_job():
+    __init()
+    return get_job_id() is not None
+
+
 def get_workspace_id() -> str:
     __init()
     return dbutils.entry_point.getDbutils().notebook().getContext().workspaceId().getOrElse(None)
