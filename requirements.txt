@@ -1,4 +1,3 @@
 pyspark
-DBUtils
 IPython
 py4j
