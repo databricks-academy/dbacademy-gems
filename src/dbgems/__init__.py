@@ -37,16 +37,19 @@ def __init():
 
 def get_dbutils() -> dbruntime.dbutils.DBUtils:
     __init()
+    global dbutils
     return dbutils
 
 
 def get_spark_session() -> pyspark.sql.SparkSession:
     __init()
+    global spark
     return spark
 
 
 def get_session_context() -> pyspark.context.SparkContext:
     __init()
+    global sc
     return sc
 
 
