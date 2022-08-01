@@ -9,7 +9,7 @@ __is_initialized = False
 
 # noinspection PyGlobalUndefined
 def __init():
-    global SparkSession
+    # global SparkSession
 
     global __is_initialized
     if __is_initialized: return
@@ -18,7 +18,7 @@ def __init():
     global spark
     try: spark
     except NameError:
-        spark = SparkSession.builder.getOrCreate()
+        spark = pyspark.sql.SparkSession.builder.getOrCreate()
 
     global sc
     try: sc
