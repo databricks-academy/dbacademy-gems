@@ -35,7 +35,7 @@ def __init():
             dbutils = IPython.get_ipython().user_ns["dbutils"]
 
 
-def get_dbutils() -> pyspark.dbutils.DBUtils:
+def get_dbutils() -> dbruntime.dbutils.DBUtils:
     __init()
     return dbutils
 
