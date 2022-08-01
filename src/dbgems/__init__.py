@@ -1,6 +1,8 @@
-from dbruntime.dbutils import DBUtils
-from pyspark.sql import SparkSession
-from pyspark.context import SparkContext
+import pyspark
+import dbruntime
+# from pyspark.dbutils import DBUtils
+# from pyspark.sql import SparkSession
+# from pyspark.context import SparkContext
 
 __is_initialized = False
 
@@ -27,23 +29,23 @@ def __init():
     try: dbutils
     except NameError:
         if spark.conf.get("spark.databricks.service.client.enabled") == "true":
-            dbutils = DBUtils(spark)
+            dbutils = dbruntime.dbutils.DBUtils(spark)
         else:
             import IPython
             dbutils = IPython.get_ipython().user_ns["dbutils"]
 
 
-def get_dbutils() -> DBUtils:
+def get_dbutils() -> pyspark.dbutils.DBUtils:
     __init()
     return dbutils
 
 
-def get_spark_session() -> SparkSession:
+def get_spark_session() -> pyspark.sql.SparkSession:
     __init()
     return spark
 
 
-def get_session_context() -> SparkContext:
+def get_session_context() -> pyspark.context.SparkContext:
     __init()
     return sc
 
@@ -188,13 +190,13 @@ def proof_of_life(expected_get_username,
     from py4j.java_collections import JavaMap
 
     value = get_dbutils()
-    assert type(value) == DBUtils, f"Expected {DBUtils}, found {type(value)}"
+    assert isinstance(value, pyspark.dbutils.DBUtils), f"Expected {pyspark.dbutils.DBUtils}, found {type(value)}"
 
     value = get_spark_session()
-    assert type(value) == SparkSession, f"Expected {SparkSession}, found {type(value)}"
+    assert isinstance(value, pyspark.sql.SparkSession), f"Expected {pyspark.sql.SparkSession}, found {type(value)}"
 
     value = get_session_context()
-    assert type(value) == SparkContext, f"Expected {SparkContext}, found {type(value)}"
+    assert isinstance(value, pyspark.context.SparkContext), f"Expected {pyspark.context.SparkContext}, found {type(value)}"
 
     value = get_parameter("some_widget", default_value="undefined")
     assert value == "undefined", f"Expected \"undefined\", found \"{value}\"."
