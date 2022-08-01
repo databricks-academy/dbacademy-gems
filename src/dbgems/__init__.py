@@ -193,7 +193,7 @@ def proof_of_life(expected_get_username,
     from py4j.java_collections import JavaMap
 
     value = get_dbutils()
-    assert isinstance(value, pyspark.dbutils.DBUtils), f"Expected {pyspark.dbutils.DBUtils}, found {type(value)}"
+    assert isinstance(value, dbruntime.dbutils.DBUtils), f"Expected {dbruntime.dbutils.DBUtils}, found {type(value)}"
 
     value = get_spark_session()
     assert isinstance(value, pyspark.sql.SparkSession), f"Expected {pyspark.sql.SparkSession}, found {type(value)}"
