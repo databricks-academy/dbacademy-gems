@@ -1,4 +1,4 @@
-from pyspark.dbutils import DBUtils
+from dbruntime.dbutils import DBUtils
 from pyspark.sql import SparkSession
 from pyspark.context import SparkContext
 
