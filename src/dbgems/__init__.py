@@ -187,9 +187,14 @@ def proof_of_life(expected_get_username,
 
     from py4j.java_collections import JavaMap
 
-    # dbgems.get_dbutils()
-    # dbgems.get_spark_session()
-    # dbgems.get_session_context()
+    value = get_dbutils()
+    assert type(value) == DBUtils, f"Expected {type(DBUtils)}, found {type(value)}"
+
+    value = get_spark_session()
+    assert type(value) == SparkSession, f"Expected {type(SparkSession)}, found {type(value)}"
+
+    value = get_session_context()
+    assert type(value) == SparkContext, f"Expected {type(SparkContext)}, found {type(value)}"
 
     value = get_parameter("some_widget", default_value="undefined")
     assert value == "undefined", f"Expected \"undefined\", found \"{value}\"."
