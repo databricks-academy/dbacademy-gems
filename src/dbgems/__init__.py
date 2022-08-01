@@ -52,19 +52,19 @@ def __init():
             dbutils = IPython.get_ipython().user_ns["dbutils"]
 
 
-def get_dbutils() -> dbutils:
-    __init()
-    return dbutils
+# def get_dbutils() -> dbutils:
+#     __init()
+#     return dbutils
 
 
-def get_spark_session() -> SparkSession:
-    __init()
-    return spark
+# def get_spark_session() -> SparkSession:
+#     __init()
+#     return spark
 
 
-def get_session_context() -> SparkContext:
-    __init()
-    return sc
+# def get_session_context() -> SparkContext:
+#     __init()
+#     return sc
 
 
 def get_parameter(name, default_value=""):
