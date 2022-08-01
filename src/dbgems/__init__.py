@@ -35,18 +35,21 @@ def __init():
             dbutils = IPython.get_ipython().user_ns["dbutils"]
 
 
+# noinspection PyGlobalUndefined
 def get_dbutils() -> dbruntime.dbutils.DBUtils:
     __init()
     global dbutils
     return dbutils
 
 
+# noinspection PyGlobalUndefined
 def get_spark_session() -> pyspark.sql.SparkSession:
     __init()
     global spark
     return spark
 
 
+# noinspection PyGlobalUndefined
 def get_session_context() -> pyspark.context.SparkContext:
     __init()
     global sc
