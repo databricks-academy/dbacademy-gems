@@ -194,80 +194,80 @@ def get_current_node_type_id(client=None):
     return cluster.get("node_type_id", None)
 
 
-def proof_of_life(expected_get_username,
-                  expected_get_tag,
-                  expected_get_browser_host_name,
-                  expected_get_workspace_id,
-                  expected_get_notebook_path,
-                  expected_get_notebook_name,
-                  expected_get_notebook_dir,
-                  expected_get_notebooks_api_endpoint,
-                  expected_get_current_spark_version,
-                  ):
-    """Because it is too difficult to validate this from the command line, this functio simply invokes all the functions as proof of life"""
-
-    from dbacademy import dbgems
-    from py4j.java_collections import JavaMap
-
-    # dbgems.get_dbutils()
-    # dbgems.get_spark_session()
-    # dbgems.get_session_context()
-
-    value = dbgems.get_parameter("some_widget", default_value="undefined")
-    assert value == "undefined", f"Expected \"undefined\", found \"{value}\"."
-
-    value = dbgems.get_cloud()
-    assert value == "AWS", f"Expected \"AWS\", found \"{value}\"."
-
-    value = dbgems.get_tags()
-    assert type(value) == JavaMap, f"Expected type \"dict\", found \"{type(value)}\"."
-
-    value = dbgems.get_tag("orgId")
-    assert value == expected_get_tag, f"Expected \"{expected_get_tag}\", found \"{value}\"."
-
-    value = dbgems.get_username()
-    assert value == expected_get_username, f"Expected \"{expected_get_username}\", found \"{value}\"."
-
-    value = dbgems.get_browser_host_name()
-    assert value == expected_get_browser_host_name, f"Expected \"{expected_get_browser_host_name}\", found \"{value}\"."
-
-    value = dbgems.get_job_id()
-    assert value == None, f"Expected \"None\", found \"{value}\"."
-
-    value = dbgems.is_job()
-    assert value == False, f"Expected \"{False}\", found \"{value}\"."
-
-    value = dbgems.get_workspace_id()
-    assert value == expected_get_workspace_id, f"Expected \"{expected_get_workspace_id}\", found \"{value}\"."
-
-    value = dbgems.get_notebook_path()
-    assert value == expected_get_notebook_path, f"Expected \"{expected_get_notebook_path}\", found \"{value}\"."
-
-    value = dbgems.get_notebook_name()
-    assert value == expected_get_notebook_name, f"Expected \"{expected_get_notebook_name}\", found \"{value}\"."
-
-    value = dbgems.get_notebook_dir()
-    assert value == expected_get_notebook_dir, f"Expected \"{expected_get_notebook_dir}\", found \"{value}\"."
-
-    value = dbgems.get_notebooks_api_endpoint()
-    assert value == expected_get_notebooks_api_endpoint, f"Expected \"{expected_get_notebooks_api_endpoint}\", found \"{value}\"."
-
-    value = dbgems.get_notebooks_api_token()
-    assert value is not None, f"Expected not-None."
-
-    value = dbgems.get_current_spark_version()
-    assert value == expected_get_current_spark_version, f"Expected \"{expected_get_current_spark_version}\", found \"{value}\"."
-
-    try:
-        dbgems.get_current_instance_pool_id()
-    except NameError as e:
-        expected = "name 'dbrest' is not defined"
-        assert str(e) == expected, f"Expected \"{expected}\", found \"{e}\"."
-
-    try:
-        dbgems.get_current_node_type_id()
-    except NameError as e:
-        expected = "name 'dbrest' is not defined"
-        assert str(e) == expected, f"Expected \"{expected}\", found \"{e}\"."
-
-    print("All tests passed!")
+# def proof_of_life(expected_get_username,
+#                   expected_get_tag,
+#                   expected_get_browser_host_name,
+#                   expected_get_workspace_id,
+#                   expected_get_notebook_path,
+#                   expected_get_notebook_name,
+#                   expected_get_notebook_dir,
+#                   expected_get_notebooks_api_endpoint,
+#                   expected_get_current_spark_version,
+#                   ):
+#     """Because it is too difficult to validate this from the command line, this functio simply invokes all the functions as proof of life"""
+#
+#     from dbacademy import dbgems
+#     from py4j.java_collections import JavaMap
+#
+#     # dbgems.get_dbutils()
+#     # dbgems.get_spark_session()
+#     # dbgems.get_session_context()
+#
+#     value = dbgems.get_parameter("some_widget", default_value="undefined")
+#     assert value == "undefined", f"Expected \"undefined\", found \"{value}\"."
+#
+#     value = dbgems.get_cloud()
+#     assert value == "AWS", f"Expected \"AWS\", found \"{value}\"."
+#
+#     value = dbgems.get_tags()
+#     assert type(value) == JavaMap, f"Expected type \"dict\", found \"{type(value)}\"."
+#
+#     value = dbgems.get_tag("orgId")
+#     assert value == expected_get_tag, f"Expected \"{expected_get_tag}\", found \"{value}\"."
+#
+#     value = dbgems.get_username()
+#     assert value == expected_get_username, f"Expected \"{expected_get_username}\", found \"{value}\"."
+#
+#     value = dbgems.get_browser_host_name()
+#     assert value == expected_get_browser_host_name, f"Expected \"{expected_get_browser_host_name}\", found \"{value}\"."
+#
+#     value = dbgems.get_job_id()
+#     assert value == None, f"Expected \"None\", found \"{value}\"."
+#
+#     value = dbgems.is_job()
+#     assert value == False, f"Expected \"{False}\", found \"{value}\"."
+#
+#     value = dbgems.get_workspace_id()
+#     assert value == expected_get_workspace_id, f"Expected \"{expected_get_workspace_id}\", found \"{value}\"."
+#
+#     value = dbgems.get_notebook_path()
+#     assert value == expected_get_notebook_path, f"Expected \"{expected_get_notebook_path}\", found \"{value}\"."
+#
+#     value = dbgems.get_notebook_name()
+#     assert value == expected_get_notebook_name, f"Expected \"{expected_get_notebook_name}\", found \"{value}\"."
+#
+#     value = dbgems.get_notebook_dir()
+#     assert value == expected_get_notebook_dir, f"Expected \"{expected_get_notebook_dir}\", found \"{value}\"."
+#
+#     value = dbgems.get_notebooks_api_endpoint()
+#     assert value == expected_get_notebooks_api_endpoint, f"Expected \"{expected_get_notebooks_api_endpoint}\", found \"{value}\"."
+#
+#     value = dbgems.get_notebooks_api_token()
+#     assert value is not None, f"Expected not-None."
+#
+#     value = dbgems.get_current_spark_version()
+#     assert value == expected_get_current_spark_version, f"Expected \"{expected_get_current_spark_version}\", found \"{value}\"."
+#
+#     try:
+#         dbgems.get_current_instance_pool_id()
+#     except NameError as e:
+#         expected = "name 'dbrest' is not defined"
+#         assert str(e) == expected, f"Expected \"{expected}\", found \"{e}\"."
+#
+#     try:
+#         dbgems.get_current_node_type_id()
+#     except NameError as e:
+#         expected = "name 'dbrest' is not defined"
+#         assert str(e) == expected, f"Expected \"{expected}\", found \"{e}\"."
+#
+#     print("All tests passed!")
