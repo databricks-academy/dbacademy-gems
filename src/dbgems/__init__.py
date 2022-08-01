@@ -5,24 +5,6 @@ from pyspark.context import SparkContext
 __is_initialized = False
 
 
-def deprecated(func):
-    """This is a decorator which can be used to mark functions
-    as deprecated. It will result in a warning being emitted
-    when the function is used."""
-    import warnings
-    import functools
-
-    @functools.wraps(func)
-    def new_func(*args, **kwargs):
-        warnings.simplefilter('always', DeprecationWarning)  # turn off filter
-        warnings.warn("Call to deprecated function {}.".format(func.__name__),
-                      category=DeprecationWarning,
-                      stacklevel=2)
-        warnings.simplefilter('default', DeprecationWarning)  # reset filter
-        return func(*args, **kwargs)
-    return new_func
-
-
 # noinspection PyGlobalUndefined
 def __init():
     global SparkSession
@@ -149,7 +131,6 @@ def get_notebooks_api_token() -> str:
     return dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiToken().getOrElse(None)
 
 
-@deprecated
 def get_current_spark_version(client=None):
     print("*" * 80)
     print("* DEPRECATION WARNING")
@@ -164,7 +145,6 @@ def get_current_spark_version(client=None):
     return cluster.get("spark_version", None)
 
 
-@deprecated
 def get_current_instance_pool_id(client=None):
     print("*" * 80)
     print("* DEPRECATION WARNING")
@@ -179,7 +159,6 @@ def get_current_instance_pool_id(client=None):
     return cluster.get("instance_pool_id", None)
 
 
-@deprecated
 def get_current_node_type_id(client=None):
     print("*" * 80)
     print("* DEPRECATION WARNING")
