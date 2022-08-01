@@ -2,6 +2,7 @@ import unittest
 
 
 class MyTestCase(unittest.TestCase):
+    pass
 
     # def test_get_parameter(self):
     #     from dbgems import get_parameter
@@ -13,6 +14,7 @@ class MyTestCase(unittest.TestCase):
     #     from dbgems import get_current_spark_version
     #     version = get_current_spark_version()
     #     self.assertEqual("moo", version)
+
 
 if __name__ == '__main__':
     unittest.main()
