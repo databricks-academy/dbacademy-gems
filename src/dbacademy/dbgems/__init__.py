@@ -191,9 +191,7 @@ def proof_of_life(expected_get_username,
                   expected_get_current_spark_version,
                   expected_get_current_instance_pool_id,
                   expected_get_current_node_type_id):
-    """Because it is too difficult to validate this from the command line, this functio simply invokes all the functions as proof of life"""
-
-    from py4j.java_collections import JavaMap
+    """Because it is too difficult to validate this from the command line, this function simply invokes all the functions as proof of life"""
 
     value = get_dbutils()
     assert isinstance(value, dbruntime.dbutils.DBUtils), f"Expected {dbruntime.dbutils.DBUtils}, found {type(value)}"
@@ -211,6 +209,7 @@ def proof_of_life(expected_get_username,
     assert value == "AWS", f"Expected \"AWS\", found \"{value}\"."
 
     value = get_tags()
+    from py4j.java_collections import JavaMap
     assert type(value) == JavaMap, f"Expected type \"dict\", found \"{type(value)}\"."
 
     value = get_tag("orgId")
