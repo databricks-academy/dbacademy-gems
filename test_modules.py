@@ -1,0 +1,2 @@
+import dbacademy
+help(dbacademy)
