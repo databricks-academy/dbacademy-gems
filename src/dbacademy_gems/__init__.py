@@ -5,6 +5,11 @@ import pyspark
 
 __is_initialized = False
 
+try:
+    from dbacademy import dbrest
+    includes_dbrest = True
+except:
+    includes_dbrest = False
 
 # noinspection PyGlobalUndefined
 def __init():
@@ -145,15 +150,15 @@ def get_current_spark_version(client=None):
     print("*" * 80)
     __init()
 
-    try:
+    if includes_dbrest:
         from dbacademy import dbrest
         cluster_id = get_tags()["clusterId"]
         client = dbrest.DBAcademyRestClient() if client is None else client
         cluster = client.clusters().get(cluster_id)
         return cluster.get("spark_version", None)
 
-    except ImportError as e:
-        raise Exception(f"Cannot use rest API with-out including dbacademy.dbrest") from e
+    else:
+        raise Exception(f"Cannot use rest API with-out including dbacademy.dbrest")
 
 def get_current_instance_pool_id(client=None):
     print("*" * 80)
@@ -162,15 +167,15 @@ def get_current_instance_pool_id(client=None):
     print("*" * 80)
     __init()
 
-    try:
+    if includes_dbrest:
         from dbacademy import dbrest
         cluster_id = get_tags()["clusterId"]
         client = dbrest.DBAcademyRestClient() if client is None else client
         cluster = client.clusters().get(cluster_id)
         return cluster.get("instance_pool_id", None)
 
-    except ImportError as e:
-        raise Exception(f"Cannot use rest API with-out including dbacademy.dbrest") from e
+    else:
+        raise Exception(f"Cannot use rest API with-out including dbacademy.dbrest")
 
 
 def get_current_node_type_id(client=None):
@@ -180,15 +185,15 @@ def get_current_node_type_id(client=None):
     print("*" * 80)
     __init()
 
-    try:
+    if includes_dbrest:
         from dbacademy import dbrest
         cluster_id = get_tags()["clusterId"]
         client = dbrest.DBAcademyRestClient() if client is None else client
         cluster = client.clusters().get(cluster_id)
         return cluster.get("node_type_id", None)
 
-    except ImportError as e:
-        raise Exception(f"Cannot use rest API with-out including dbacademy.dbrest") from e
+    else:
+        raise Exception(f"Cannot use rest API with-out including dbacademy.dbrest")
 
 
 def proof_of_life(expected_get_username,
@@ -258,13 +263,14 @@ def proof_of_life(expected_get_username,
     value = get_notebooks_api_token()
     assert value is not None, f"Expected not-None."
 
-    value = get_current_spark_version()
-    assert value == expected_get_current_spark_version, f"Expected \"{expected_get_current_spark_version}\", found \"{value}\"."
+    if includes_dbrest:
+        value = get_current_spark_version()
+        assert value == expected_get_current_spark_version, f"Expected \"{expected_get_current_spark_version}\", found \"{value}\"."
 
-    value = get_current_instance_pool_id()
-    assert value == expected_get_current_instance_pool_id, f"Expected \"{expected_get_current_instance_pool_id}\", found \"{value}\"."
+        value = get_current_instance_pool_id()
+        assert value == expected_get_current_instance_pool_id, f"Expected \"{expected_get_current_instance_pool_id}\", found \"{value}\"."
 
-    value = get_current_node_type_id()
-    assert value == expected_get_current_node_type_id, f"Expected \"{expected_get_current_node_type_id}\", found \"{value}\"."
+        value = get_current_node_type_id()
+        assert value == expected_get_current_node_type_id, f"Expected \"{expected_get_current_node_type_id}\", found \"{value}\"."
 
     print("All tests passed!")
