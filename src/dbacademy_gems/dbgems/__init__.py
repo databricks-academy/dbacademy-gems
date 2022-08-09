@@ -142,12 +142,15 @@ def get_notebooks_api_token() -> str:
     __init()
     return dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiToken().getOrElse(None)
 
+def print_deprecated(method, new_package):
+    print(f"*" * 80)
+    print(f"* DEPRECATION WARNING")
+    print(f"* The method {method} is deprecated, use {new_package}.{method} instead")
+    print(f"* dbacademy.dbrest.clusters().get_current_spark_version() instead")
+    print(f"*" * 80)
 
 def get_current_spark_version(client=None):
-    print("*" * 80)
-    print("* DEPRECATION WARNING")
-    print("* dbacademy.dbrest.clusters().get_current_spark_version() instead")
-    print("*" * 80)
+    print_deprecated("get_current_spark_version()", "dbacademy.dbrest.clusters()")
     __init()
 
     if includes_dbrest:
@@ -163,10 +166,7 @@ def get_current_spark_version(client=None):
 
 # noinspection PyUnresolvedReferences
 def get_current_instance_pool_id(client=None):
-    print("*" * 80)
-    print("* DEPRECATION WARNING")
-    print("* dbacademy.dbrest.clusters().get_current_instance_pool_id() instead")
-    print("*" * 80)
+    print_deprecated("get_current_instance_pool_id()", "dbacademy.dbrest.clusters()")
     __init()
 
     if includes_dbrest:
@@ -182,10 +182,7 @@ def get_current_instance_pool_id(client=None):
 
 # noinspection PyUnresolvedReferences
 def get_current_node_type_id(client=None):
-    print("*" * 80)
-    print("* DEPRECATION WARNING")
-    print("* dbacademy.dbrest.clusters().get_current_node_type_id() instead")
-    print("*" * 80)
+    print_deprecated("get_current_node_type_id()", "dbacademy.dbrest.clusters()")
     __init()
 
     if includes_dbrest:
@@ -268,6 +265,12 @@ def proof_of_life(expected_get_username,
     assert value is not None, f"Expected not-None."
 
     if includes_dbrest:
+        print(f"*" * 80)
+        print(f"* DEPENDENCY ERROR")
+        print(f"* The methods get_current_spark_version(), get_current_instance_pool_id(), and get_current_node_type_id()")
+        print(f"* require inclusion of the dbacademy_rest libraries")
+        print(f"*" * 80)
+
         value = get_current_spark_version()
         assert value == expected_get_current_spark_version, f"Expected \"{expected_get_current_spark_version}\", found \"{value}\"."
 
