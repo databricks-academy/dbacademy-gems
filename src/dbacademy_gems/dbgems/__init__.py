@@ -267,8 +267,8 @@ def proof_of_life(expected_get_username,
     if not includes_dbrest:
         print(f"*" * 80)
         print(f"* DEPENDENCY ERROR")
-        print(f"* The methods get_current_spark_version(), get_current_instance_pool_id(), and get_current_node_type_id()")
-        print(f"* require inclusion of the dbacademy_rest libraries")
+        print(f"* The methods get_current_spark_version(), get_current_instance_pool_id(),")
+        print(f"* and get_current_node_type_id() require inclusion of the dbacademy_rest libraries")
         print(f"*" * 80)
     else:
         value = get_current_spark_version()
