@@ -264,13 +264,13 @@ def proof_of_life(expected_get_username,
     value = get_notebooks_api_token()
     assert value is not None, f"Expected not-None."
 
-    if includes_dbrest:
+    if not includes_dbrest:
         print(f"*" * 80)
         print(f"* DEPENDENCY ERROR")
         print(f"* The methods get_current_spark_version(), get_current_instance_pool_id(), and get_current_node_type_id()")
         print(f"* require inclusion of the dbacademy_rest libraries")
         print(f"*" * 80)
-
+    else:
         value = get_current_spark_version()
         assert value == expected_get_current_spark_version, f"Expected \"{expected_get_current_spark_version}\", found \"{value}\"."
 
