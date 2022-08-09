@@ -204,6 +204,7 @@ def proof_of_life(expected_get_username,
                   expected_get_current_node_type_id):
     """Because it is too difficult to validate this from the command line, this functio simply invokes all the functions as proof of life"""
 
+    import dbruntime
     from py4j.java_collections import JavaMap
 
     value = get_dbutils()
