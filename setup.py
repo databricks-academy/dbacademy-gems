@@ -15,6 +15,6 @@ def find_dbacademy_packages():
 setuptools.setup(
     name="dbacademy-gems",
     version="0.1",
-    package_dir={"dbacademy": "src/dbacademy"},
+    package_dir={"": "src"},
     packages=find_dbacademy_packages()
 )
