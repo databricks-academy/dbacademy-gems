@@ -1,3 +1,4 @@
+py4j
 IPython
 pyspark==3.*
 databricks-connect==9.1.*
