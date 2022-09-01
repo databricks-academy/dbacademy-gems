@@ -142,6 +142,11 @@ def get_notebooks_api_token() -> str:
     __init()
     return dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiToken().getOrElse(None)
 
+def jprint(value: dict, indent: int = 4):
+    assert type(value) == dict, f"Expected value to be of type \"dict\", found \"{type(value)}\"."
+    import json
+    print(json.dumps(value, indent=indent))
+
 def print_deprecated(method, new_package):
     print(f"*" * 80)
     print(f"* DEPRECATION WARNING")
