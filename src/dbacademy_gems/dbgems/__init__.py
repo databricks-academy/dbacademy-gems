@@ -148,7 +148,8 @@ def get_notebooks_api_token() -> str:
     return dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiToken().getOrElse(None)
 
 def jprint(value: dict, indent: int = 4):
-    assert type(value) == dict, f"Expected value to be of type \"dict\", found \"{type(value)}\"."
+    assert type(value) == dict or type(value) == list, f"Expected value to be of type \"dict\" or \"list\", found \"{type(value)}\"."
+
     import json
     print(json.dumps(value, indent=indent))
 
