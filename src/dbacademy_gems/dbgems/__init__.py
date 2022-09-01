@@ -60,12 +60,17 @@ def get_session_context() -> pyspark.context.SparkContext:
     global sc
     return sc
 
-
 def get_parameter(name, default_value=""):
     __init()
-    try: return str(dbutils.widgets.get(name))
-    except: return default_value
-
+    from py4j.protocol import Py4JJavaError
+    try:
+        result = dbutils.widgets.get(name)
+        return result or default_value
+    except Py4JJavaError as ex:
+        if "InputWidgetNotDefined" not in ex.java_exception.getClass().getName():
+            raise ex
+        else:
+            return default_value
 
 def get_cloud():
     __init()
