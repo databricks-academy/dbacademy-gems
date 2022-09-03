@@ -293,3 +293,25 @@ def proof_of_life(expected_get_username,
         assert value == expected_get_current_node_type_id, f"Expected \"{expected_get_current_node_type_id}\", found \"{value}\"."
 
     print("All tests passed!")
+
+def display_html(html) -> None:
+    import inspect
+    caller_frame = inspect.currentframe().f_back
+    while caller_frame is not None:
+        caller_globals = caller_frame.f_globals
+        function = caller_globals.get("displayHTML")
+        if function:
+            return function(html)
+        caller_frame = caller_frame.f_back
+    raise ValueError("displayHTML not found in any caller frames.")
+
+def display(html) -> None:
+    import inspect
+    caller_frame = inspect.currentframe().f_back
+    while caller_frame is not None:
+        caller_globals = caller_frame.f_globals
+        function = caller_globals.get("display")
+        if function:
+            return function(html)
+        caller_frame = caller_frame.f_back
+    raise ValueError("display not found in any caller frames.")
