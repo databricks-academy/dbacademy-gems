@@ -1,11 +1,10 @@
 import pyspark
-# from pyspark.dbutils import DBUtils
-# from pyspark.sql import SparkSession
-# from pyspark.context import SparkContext
+from deprecated.classic import deprecated
 
 __is_initialized = False
 
 try:
+    # noinspection PyUnresolvedReferences
     from dbacademy import dbrest
     includes_dbrest = True
 except:
@@ -59,6 +58,9 @@ def get_session_context() -> pyspark.context.SparkContext:
     __init()
     global sc
     return sc
+
+def sql(query):
+    return get_spark_session().sql(query)
 
 def get_parameter(name, default_value=""):
     __init()
@@ -153,18 +155,12 @@ def jprint(value: dict, indent: int = 4):
     import json
     print(json.dumps(value, indent=indent))
 
-def print_deprecated(method, new_package):
-    print(f"*" * 80)
-    print(f"* DEPRECATION WARNING")
-    print(f"* The method {method} is deprecated, use {new_package}.{method} instead")
-    print(f"* dbacademy.dbrest.clusters().get_current_spark_version() instead")
-    print(f"*" * 80)
-
+@deprecated
 def get_current_spark_version(client=None):
-    print_deprecated("get_current_spark_version()", "dbacademy.dbrest.clusters()")
     __init()
 
     if includes_dbrest:
+        # noinspection PyUnresolvedReferences
         from dbacademy import dbrest
         cluster_id = get_tags()["clusterId"]
         client = dbrest.DBAcademyRestClient() if client is None else client
@@ -174,13 +170,12 @@ def get_current_spark_version(client=None):
     else:
         raise Exception(f"Cannot use rest API with-out including dbacademy.dbrest")
 
-
-# noinspection PyUnresolvedReferences
+@deprecated
 def get_current_instance_pool_id(client=None):
-    print_deprecated("get_current_instance_pool_id()", "dbacademy.dbrest.clusters()")
     __init()
 
     if includes_dbrest:
+        # noinspection PyUnresolvedReferences
         from dbacademy import dbrest
         cluster_id = get_tags()["clusterId"]
         client = dbrest.DBAcademyRestClient() if client is None else client
@@ -191,12 +186,12 @@ def get_current_instance_pool_id(client=None):
         raise Exception(f"Cannot use rest API with-out including dbacademy.dbrest")
 
 
-# noinspection PyUnresolvedReferences
+@deprecated
 def get_current_node_type_id(client=None):
-    print_deprecated("get_current_node_type_id()", "dbacademy.dbrest.clusters()")
     __init()
 
     if includes_dbrest:
+        # noinspection PyUnresolvedReferences
         from dbacademy import dbrest
         cluster_id = get_tags()["clusterId"]
         client = dbrest.DBAcademyRestClient() if client is None else client

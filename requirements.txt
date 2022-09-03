@@ -1,4 +1,5 @@
 py4j
 IPython
 pyspark==3.*
+Deprecated~=1.2.13
 databricks-connect==9.1.*
