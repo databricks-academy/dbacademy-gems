@@ -27,14 +27,16 @@ def __init():
     except NameError:
         sc = spark.sparkContext
 
-    global dbutils
-    try: dbutils
+    global dbutils, __dbutils
+    try:
+        dbutils
     except NameError:
         if spark.conf.get("spark.databricks.service.client.enabled") == "true":
             dbutils = dbruntime.dbutils.DBUtils(spark)
         else:
             import IPython
             dbutils = IPython.get_ipython().user_ns["dbutils"]
+    __dbutils = dbutils
 
 def deprecation_logging_enabled():
     import os
@@ -66,7 +68,8 @@ def dbutils():  # -> dbruntime.dbutils.DBUtils:
 
 @deprecated(reason="Use dbgems.dbutils() instead.")
 def get_dbutils():  # -> dbruntime.dbutils.DBUtils:
-    return dbutils()
+    __init()
+    return __dbutils
 
 def spark() -> pyspark.sql.SparkSession:
     __init()
