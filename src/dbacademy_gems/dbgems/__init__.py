@@ -41,7 +41,8 @@ def deprecation_logging_enabled():
     return os.environ.get("dbacademy_helper_deprecated", "").lower() == "enabled"
 
 def print_warning(message: str, title: str, length: int = 80):
-    print(f"* {title.upper()} ", end="*"*(length-len(title)-3))
+    length = length - len(title) - 3
+    print(f"""* {title.upper()} {("*"*length)}""")
     for line in message.split("\n"):
         print(f"* {line}")
     print("*"*length)
