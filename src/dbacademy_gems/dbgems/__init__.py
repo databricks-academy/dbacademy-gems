@@ -67,7 +67,10 @@ def dbutils():  # -> dbruntime.dbutils.DBUtils:
 
 @deprecated(reason="Use dbgems.dbutils instead.")
 def get_dbutils():  # -> dbruntime.dbutils.DBUtils:
-    return dbutils()
+    __init()
+    # noinspection PyGlobalUndefined
+    global dbutils
+    return dbutils
 
 def get_spark_session() -> pyspark.sql.SparkSession:
     __init()
