@@ -27,7 +27,7 @@ def __init():
     except NameError:
         sc = spark.sparkContext
 
-    global dbutils, __dbutils
+    global dbutils
     try:
         dbutils
     except NameError:
@@ -36,7 +36,14 @@ def __init():
         else:
             import IPython
             dbutils = IPython.get_ipython().user_ns["dbutils"]
-    __dbutils = dbutils
+
+    import sys
+    modname = globals()['__name__']
+    print("-"*80)
+    print(modname)
+    print("-"*80)
+    module = sys.modules[modname]
+
 
 def deprecation_logging_enabled():
     import os
