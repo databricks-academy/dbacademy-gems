@@ -1,5 +1,10 @@
 import dbacademy_gems.dbgems
 
+from dbacademy_gems.dbgems import print_warning, deprecation_logging_enabled
+
+if deprecation_logging_enabled:
+    print_warning(title="DEPRECATED", message=f"dbacademy.dbgems is deprecated, use dbacademy_gems.dbgems instead.")
+
 get_browser_host_name = dbacademy_gems.dbgems.get_browser_host_name
 get_cloud = dbacademy_gems.dbgems.get_cloud
 get_current_instance_pool_id = dbacademy_gems.dbgems.get_current_instance_pool_id
