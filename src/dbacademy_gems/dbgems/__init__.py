@@ -58,32 +58,35 @@ def deprecated(reason=None):
         return wrapper
     return decorator
 
-@property
 def dbutils():  # -> dbruntime.dbutils.DBUtils:
     __init()
     # noinspection PyGlobalUndefined
     global dbutils
     return dbutils
 
-@deprecated(reason="Use dbgems.dbutils instead.")
+@deprecated(reason="Use dbgems.dbutils() instead.")
 def get_dbutils():  # -> dbruntime.dbutils.DBUtils:
-    __init()
-    # noinspection PyGlobalUndefined
-    global dbutils
-    return dbutils
+    return dbutils()
 
-def get_spark_session() -> pyspark.sql.SparkSession:
+def spark() -> pyspark.sql.SparkSession:
     __init()
     # noinspection PyGlobalUndefined
     global spark
     return spark
 
+@deprecated(reason="Use dbgems.spark() instead.")
+def get_spark_session() -> pyspark.sql.SparkSession:
+    return spark()
 
-def get_session_context() -> pyspark.context.SparkContext:
+def sc() -> pyspark.context.SparkContext:
     __init()
     # noinspection PyGlobalUndefined
     global sc
     return sc
+
+@deprecated(reason="Use dbgems.sc() instead.")
+def get_session_context() -> pyspark.context.SparkContext:
+    return sc()
 
 def sql(query):
     return get_spark_session().sql(query)
