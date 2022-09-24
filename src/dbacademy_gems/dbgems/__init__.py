@@ -43,8 +43,7 @@ def deprecation_logging_enabled():
 def print_warning(message: str, title: str, length: int = 80):
     print(f"* {title.upper()} ", end="*"*(length-len(title)-3))
     for line in message.split("\n"):
-        print("* ")
-        print(line)
+        print(f"* {line}")
     print("*"*length)
 
 def deprecated(reason=None):
