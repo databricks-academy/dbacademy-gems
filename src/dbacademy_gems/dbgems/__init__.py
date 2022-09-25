@@ -44,8 +44,7 @@ def __init_globals():
     sys.modules[globals()['__name__']].dbutils = dbutils
 
 def deprecation_logging_enabled():
-    import os
-    status = spark.conf.get("dbacademy.deprecation.printing")
+    status = spark.conf.get("dbacademy.deprecation.printing", None)
     print(f"dbacademy.deprecation.printing: {status}")
     return status is not None and status.lower() == "enabled"
 
