@@ -45,8 +45,8 @@ def __init_globals():
 
 def deprecation_logging_enabled():
     import os
-    status = os.environ.get("dbacademy_deprecation_printer")
-    print(f"deprecation_logging_enabled: {status}")
+    status = spark.conf.get("dbacademy.deprecation.printing")
+    print(f"dbacademy.deprecation.printing: {status}")
     return status is not None and status.lower() == "enabled"
 
 def print_warning(message: str, title: str, length: int = 80):
