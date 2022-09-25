@@ -11,11 +11,13 @@ except:
 
 # noinspection PyGlobalUndefined
 def __init():
-    import dbruntime
+    import sys, dbruntime
 
     global __is_initialized
     if __is_initialized: return
     else: __is_initialized = True
+
+    module = sys.modules[globals()['__name__']]
 
     global spark
     try: spark
@@ -36,14 +38,7 @@ def __init():
         else:
             import IPython
             dbutils = IPython.get_ipython().user_ns["dbutils"]
-
-    import sys
-    modname = globals()['__name__']
-    print("-"*80)
-    print(modname)
-    print("-"*80)
-    module = sys.modules[modname]
-
+    module.dbutils = dbutils
 
 def deprecation_logging_enabled():
     import os
@@ -67,16 +62,18 @@ def deprecated(reason=None):
         return wrapper
     return decorator
 
-def dbutils():  # -> dbruntime.dbutils.DBUtils:
+# def dbutils():  # -> dbruntime.dbutils.DBUtils:
+#     __init()
+#     # noinspection PyGlobalUndefined
+#     global dbutils
+#     return dbutils
+
+@deprecated(reason="Use dbgems.dbutils instead.")
+def get_dbutils():  # -> dbruntime.dbutils.DBUtils:
     __init()
     # noinspection PyGlobalUndefined
     global dbutils
     return dbutils
-
-@deprecated(reason="Use dbgems.dbutils() instead.")
-def get_dbutils():  # -> dbruntime.dbutils.DBUtils:
-    __init()
-    return __dbutils
 
 def spark() -> pyspark.sql.SparkSession:
     __init()
