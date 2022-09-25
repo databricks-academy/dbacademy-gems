@@ -313,3 +313,7 @@ def display(html) -> None:
 
 
 __init_globals()
+
+sc = dbgems_module.sc
+spark = dbgems_module.spark
+dbutils = dbgems_module.dbutils
