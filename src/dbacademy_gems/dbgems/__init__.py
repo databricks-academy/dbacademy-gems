@@ -165,7 +165,7 @@ def jprint(value: dict, indent: int = 4):
     import json
     print(json.dumps(value, indent=indent))
 
-@deprecated(reason="SEe")
+@deprecated(reason="Use dbacademy.dbrest.clusters.get_current_spark_version() instead.")
 def get_current_spark_version(client=None):
     if includes_dbrest:
         # noinspection PyUnresolvedReferences
