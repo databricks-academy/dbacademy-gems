@@ -61,9 +61,16 @@ def deprecated(reason=None):
         def wrapper(*args, **kwargs):
             if deprecation_logging_enabled():
                 assert reason is not None, f"The deprecated reason must be specified."
-                print_warning(title="DEPRECATED", message=reason)
-            result = inner_function(*args, **kwargs)
-            return result
+                try:
+                    import inspect
+                    function_name = str(inner_function.__name__) + str(inspect.signature(inner_function))
+                    final_reason = f"{reason}\n{function_name}"
+                except: final_reason = reason  # just in case
+
+                print_warning(title="DEPRECATED", message=final_reason)
+
+            return inner_function(*args, **kwargs)
+
         return wrapper
     return decorator
 
