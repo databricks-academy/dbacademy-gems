@@ -9,8 +9,6 @@ try:
 except:
     includes_dbrest = False
 
-print("Moo")
-
 # noinspection PyGlobalUndefined
 def __init_globals():
     import sys, dbruntime
@@ -47,7 +45,9 @@ def __init_globals():
 
 def deprecation_logging_enabled():
     import os
-    return os.environ.get("dbacademy_helper_deprecated", "").lower() == "enabled"
+    status = os.environ.get("dbacademy_deprecation_printer")
+    print(f"deprecation_logging_enabled: {status}")
+    return status is not None and status.lower() == "enabled"
 
 def print_warning(message: str, title: str, length: int = 80):
     length = length - len(title) - 3
