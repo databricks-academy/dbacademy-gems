@@ -1,4 +1,4 @@
-import pyspark
+import sys, pyspark
 
 __is_initialized = False
 
@@ -9,9 +9,11 @@ try:
 except:
     includes_dbrest = False
 
+dbgems_module = sys.modules[globals()['__name__']]
+
 # noinspection PyGlobalUndefined
 def __init_globals():
-    import sys, dbruntime
+    import dbruntime
 
     global __is_initialized
     if __is_initialized: return
@@ -22,14 +24,14 @@ def __init_globals():
     except NameError:
         spark = pyspark.sql.SparkSession.builder.getOrCreate()
 
-    sys.modules[globals()['__name__']].spark = spark
+    dbgems_module.spark = spark
 
     global sc
     try: sc
     except NameError:
         sc = spark.sparkContext
 
-    sys.modules[globals()['__name__']].sc = sc
+    dbgems_module.sc = sc
 
     global dbutils
     try:
@@ -41,7 +43,7 @@ def __init_globals():
             import IPython
             dbutils = IPython.get_ipython().user_ns["dbutils"]
 
-    sys.modules[globals()['__name__']].dbutils = dbutils
+    dbgems_module.dbutils = dbutils
 
 def deprecation_logging_enabled():
     status = spark.conf.get("dbacademy.deprecation.printing", None)
@@ -67,21 +69,15 @@ def deprecated(reason=None):
 
 @deprecated(reason="Use dbgems.dbutils instead.")
 def get_dbutils():  # -> dbruntime.dbutils.DBUtils:
-    # noinspection PyGlobalUndefined
-    global dbutils
-    return dbutils
+    return dbgems_module.dbutils
 
 @deprecated(reason="Use dbgems.spark() instead.")
 def get_spark_session() -> pyspark.sql.SparkSession:
-    # noinspection PyGlobalUndefined
-    global spark
-    return spark
+    return dbgems_module.spark
 
 @deprecated(reason="Use dbgems.sc() instead.")
 def get_session_context() -> pyspark.context.SparkContext:
-    # noinspection PyGlobalUndefined
-    global sc
-    return sc
+    return dbgems_module.sc
 
 def sql(query):
     return get_spark_session().sql(query)
@@ -228,13 +224,13 @@ def proof_of_life(expected_get_username,
     import dbruntime
     from py4j.java_collections import JavaMap
 
-    value = get_dbutils()
+    value = dbgems_module.dbutils
     assert isinstance(value, dbruntime.dbutils.DBUtils), f"Expected {dbruntime.dbutils.DBUtils}, found {type(value)}"
 
-    value = get_spark_session()
+    value = dbgems_module.spark
     assert isinstance(value, pyspark.sql.SparkSession), f"Expected {pyspark.sql.SparkSession}, found {type(value)}"
 
-    value = get_session_context()
+    value = dbgems_module.sc
     assert isinstance(value, pyspark.context.SparkContext), f"Expected {pyspark.context.SparkContext}, found {type(value)}"
 
     value = get_parameter("some_widget", default_value="undefined")
