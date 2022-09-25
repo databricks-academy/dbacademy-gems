@@ -78,11 +78,11 @@ def deprecated(reason=None):
 def get_dbutils():  # -> dbruntime.dbutils.DBUtils:
     return dbgems_module.dbutils
 
-@deprecated(reason="Use dbgems.spark() instead.")
+@deprecated(reason="Use dbgems.spark instead.")
 def get_spark_session() -> pyspark.sql.SparkSession:
     return dbgems_module.spark
 
-@deprecated(reason="Use dbgems.sc() instead.")
+@deprecated(reason="Use dbgems.sc instead.")
 def get_session_context() -> pyspark.context.SparkContext:
     return dbgems_module.sc
 
