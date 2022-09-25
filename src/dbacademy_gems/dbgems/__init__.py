@@ -12,7 +12,7 @@ except:
 print("Moo")
 
 # noinspection PyGlobalUndefined
-def __init():
+def __init_globals():
     import sys, dbruntime
 
     global __is_initialized
@@ -69,21 +69,18 @@ def deprecated(reason=None):
 
 @deprecated(reason="Use dbgems.dbutils instead.")
 def get_dbutils():  # -> dbruntime.dbutils.DBUtils:
-    __init()
     # noinspection PyGlobalUndefined
     global dbutils
     return dbutils
 
 @deprecated(reason="Use dbgems.spark() instead.")
 def get_spark_session() -> pyspark.sql.SparkSession:
-    __init()
     # noinspection PyGlobalUndefined
     global spark
     return spark
 
 @deprecated(reason="Use dbgems.sc() instead.")
 def get_session_context() -> pyspark.context.SparkContext:
-    __init()
     # noinspection PyGlobalUndefined
     global sc
     return sc
@@ -92,7 +89,6 @@ def sql(query):
     return get_spark_session().sql(query)
 
 def get_parameter(name, default_value=""):
-    __init()
     from py4j.protocol import Py4JJavaError
     try:
         # noinspection PyUnresolvedReferences
@@ -105,7 +101,6 @@ def get_parameter(name, default_value=""):
             return default_value
 
 def get_cloud():
-    __init()
     with open("/databricks/common/conf/deploy.conf") as f:
         for line in f:
             if "databricks.instance.metadata.cloudProvider" in line and "\"GCP\"" in line:
@@ -119,67 +114,54 @@ def get_cloud():
 
 
 def get_tags() -> dict:
-    __init()
     # noinspection PyProtectedMember,PyUnresolvedReferences
     return sc._jvm.scala.collection.JavaConversions.mapAsJavaMap(
         dbutils.entry_point.getDbutils().notebook().getContext().tags())
 
 
 def get_tag(tag_name: str, default_value: str = None) -> str:
-    __init()
     return get_tags().get(tag_name, default_value)
 
 
 def get_username() -> str:
-    __init()
     return get_tags()["user"]
 
 
 def get_browser_host_name():
-    __init()
     return get_tags()["browserHostName"]
 
 
 def get_job_id():
-    __init()
     return get_tags()["jobId"]
 
 
 def is_job():
-    __init()
     return get_job_id() is not None
 
 
 def get_workspace_id() -> str:
-    __init()
     # noinspection PyUnresolvedReferences
     return dbutils.entry_point.getDbutils().notebook().getContext().workspaceId().getOrElse(None)
 
 
 def get_notebook_path() -> str:
-    __init()
     # noinspection PyUnresolvedReferences
     return dbutils.entry_point.getDbutils().notebook().getContext().notebookPath().getOrElse(None)
 
 
 def get_notebook_name() -> str:
-    __init()
     return get_notebook_path().split("/")[-1]
 
 
 def get_notebook_dir(offset=-1) -> str:
-    __init()
     return "/".join(get_notebook_path().split("/")[:offset])
 
-
 def get_notebooks_api_endpoint() -> str:
-    __init()
     # noinspection PyUnresolvedReferences
     return dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiUrl().getOrElse(None)
 
 
 def get_notebooks_api_token() -> str:
-    __init()
     # noinspection PyUnresolvedReferences
     return dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiToken().getOrElse(None)
 
@@ -191,8 +173,6 @@ def jprint(value: dict, indent: int = 4):
 
 @deprecated(reason="SEe")
 def get_current_spark_version(client=None):
-    __init()
-
     if includes_dbrest:
         # noinspection PyUnresolvedReferences
         from dbacademy import dbrest
@@ -206,8 +186,6 @@ def get_current_spark_version(client=None):
 
 @deprecated(reason="Use dbacademy.dbrest.clusters.get_current_instance_pool_id() instead.")
 def get_current_instance_pool_id(client=None):
-    __init()
-
     if includes_dbrest:
         # noinspection PyUnresolvedReferences
         from dbacademy import dbrest
@@ -222,7 +200,6 @@ def get_current_instance_pool_id(client=None):
 
 @deprecated(reason="Use dbacademy.dbrest.clusters.get_current_node_type_id() instead.")
 def get_current_node_type_id(client=None):
-    __init()
 
     if includes_dbrest:
         # noinspection PyUnresolvedReferences
@@ -339,3 +316,6 @@ def display(html) -> None:
             return function(html)
         caller_frame = caller_frame.f_back
     raise ValueError("display not found in any caller frames.")
+
+
+__init_globals()
