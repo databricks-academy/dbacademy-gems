@@ -87,7 +87,7 @@ def get_session_context() -> pyspark.context.SparkContext:
     return dbgems_module.sc
 
 def sql(query):
-    return get_spark_session().sql(query)
+    return spark.sql(query)
 
 def get_parameter(name, default_value=""):
     from py4j.protocol import Py4JJavaError
