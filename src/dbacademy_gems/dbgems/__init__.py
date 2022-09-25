@@ -1,5 +1,4 @@
-import pyspark
-from deprecated.classic import deprecated
+import sys, pyspark
 
 __is_initialized = False
 
@@ -10,10 +9,11 @@ try:
 except:
     includes_dbrest = False
 
+dbgems_module = sys.modules[globals()['__name__']]
+
 # noinspection PyGlobalUndefined
-def __init():
+def __init_globals():
     import dbruntime
-    # global SparkSession
 
     global __is_initialized
     if __is_initialized: return
@@ -24,13 +24,18 @@ def __init():
     except NameError:
         spark = pyspark.sql.SparkSession.builder.getOrCreate()
 
+    dbgems_module.spark = spark
+
     global sc
     try: sc
     except NameError:
         sc = spark.sparkContext
 
+    dbgems_module.sc = sc
+
     global dbutils
-    try: dbutils
+    try:
+        dbutils
     except NameError:
         if spark.conf.get("spark.databricks.service.client.enabled") == "true":
             dbutils = dbruntime.dbutils.DBUtils(spark)
@@ -38,34 +43,49 @@ def __init():
             import IPython
             dbutils = IPython.get_ipython().user_ns["dbutils"]
 
+    dbgems_module.dbutils = dbutils
 
-# noinspection PyGlobalUndefined
+def deprecation_logging_enabled():
+    status = spark.conf.get("dbacademy.deprecation.printing", None)
+    return status is not None and status.lower() == "enabled"
+
+def print_warning(title: str, message: str, length: int = 80):
+    title_len = length - len(title) - 3
+    print(f"""* {title.upper()} {("*"*title_len)}""")
+    for line in message.split("\n"):
+        print(f"* {line}")
+    print("*"*length)
+
+def deprecated(reason=None):
+    def decorator(inner_function):
+        def wrapper(*args, **kwargs):
+            if deprecation_logging_enabled():
+                assert reason is not None, f"The deprecated reason must be specified."
+                print_warning(title="DEPRECATED", message=reason)
+            result = inner_function(*args, **kwargs)
+            return result
+        return wrapper
+    return decorator
+
+@deprecated(reason="Use dbgems.dbutils instead.")
 def get_dbutils():  # -> dbruntime.dbutils.DBUtils:
-    __init()
-    global dbutils
-    return dbutils
+    return dbgems_module.dbutils
 
-
-# noinspection PyGlobalUndefined
+@deprecated(reason="Use dbgems.spark() instead.")
 def get_spark_session() -> pyspark.sql.SparkSession:
-    __init()
-    global spark
-    return spark
+    return dbgems_module.spark
 
-
-# noinspection PyGlobalUndefined
+@deprecated(reason="Use dbgems.sc() instead.")
 def get_session_context() -> pyspark.context.SparkContext:
-    __init()
-    global sc
-    return sc
+    return dbgems_module.sc
 
 def sql(query):
     return get_spark_session().sql(query)
 
 def get_parameter(name, default_value=""):
-    __init()
     from py4j.protocol import Py4JJavaError
     try:
+        # noinspection PyUnresolvedReferences
         result = dbutils.widgets.get(name)
         return result or default_value
     except Py4JJavaError as ex:
@@ -75,7 +95,6 @@ def get_parameter(name, default_value=""):
             return default_value
 
 def get_cloud():
-    __init()
     with open("/databricks/common/conf/deploy.conf") as f:
         for line in f:
             if "databricks.instance.metadata.cloudProvider" in line and "\"GCP\"" in line:
@@ -89,64 +108,55 @@ def get_cloud():
 
 
 def get_tags() -> dict:
-    __init()
-    # noinspection PyProtectedMember
+    # noinspection PyProtectedMember,PyUnresolvedReferences
     return sc._jvm.scala.collection.JavaConversions.mapAsJavaMap(
         dbutils.entry_point.getDbutils().notebook().getContext().tags())
 
 
 def get_tag(tag_name: str, default_value: str = None) -> str:
-    __init()
     return get_tags().get(tag_name, default_value)
 
 
 def get_username() -> str:
-    __init()
     return get_tags()["user"]
 
 
 def get_browser_host_name():
-    __init()
     return get_tags()["browserHostName"]
 
 
 def get_job_id():
-    __init()
     return get_tags()["jobId"]
 
 
 def is_job():
-    __init()
     return get_job_id() is not None
 
 
 def get_workspace_id() -> str:
-    __init()
+    # noinspection PyUnresolvedReferences
     return dbutils.entry_point.getDbutils().notebook().getContext().workspaceId().getOrElse(None)
 
 
 def get_notebook_path() -> str:
-    __init()
+    # noinspection PyUnresolvedReferences
     return dbutils.entry_point.getDbutils().notebook().getContext().notebookPath().getOrElse(None)
 
 
 def get_notebook_name() -> str:
-    __init()
     return get_notebook_path().split("/")[-1]
 
 
 def get_notebook_dir(offset=-1) -> str:
-    __init()
     return "/".join(get_notebook_path().split("/")[:offset])
 
-
 def get_notebooks_api_endpoint() -> str:
-    __init()
+    # noinspection PyUnresolvedReferences
     return dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiUrl().getOrElse(None)
 
 
 def get_notebooks_api_token() -> str:
-    __init()
+    # noinspection PyUnresolvedReferences
     return dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiToken().getOrElse(None)
 
 def jprint(value: dict, indent: int = 4):
@@ -155,10 +165,8 @@ def jprint(value: dict, indent: int = 4):
     import json
     print(json.dumps(value, indent=indent))
 
-@deprecated
+@deprecated(reason="Use dbacademy.dbrest.clusters.get_current_spark_version() instead.")
 def get_current_spark_version(client=None):
-    __init()
-
     if includes_dbrest:
         # noinspection PyUnresolvedReferences
         from dbacademy import dbrest
@@ -170,10 +178,8 @@ def get_current_spark_version(client=None):
     else:
         raise Exception(f"Cannot use rest API with-out including dbacademy.dbrest")
 
-@deprecated
+@deprecated(reason="Use dbacademy.dbrest.clusters.get_current_instance_pool_id() instead.")
 def get_current_instance_pool_id(client=None):
-    __init()
-
     if includes_dbrest:
         # noinspection PyUnresolvedReferences
         from dbacademy import dbrest
@@ -186,9 +192,8 @@ def get_current_instance_pool_id(client=None):
         raise Exception(f"Cannot use rest API with-out including dbacademy.dbrest")
 
 
-@deprecated
+@deprecated(reason="Use dbacademy.dbrest.clusters.get_current_node_type_id() instead.")
 def get_current_node_type_id(client=None):
-    __init()
 
     if includes_dbrest:
         # noinspection PyUnresolvedReferences
@@ -219,13 +224,13 @@ def proof_of_life(expected_get_username,
     import dbruntime
     from py4j.java_collections import JavaMap
 
-    value = get_dbutils()
+    value = dbgems_module.dbutils
     assert isinstance(value, dbruntime.dbutils.DBUtils), f"Expected {dbruntime.dbutils.DBUtils}, found {type(value)}"
 
-    value = get_spark_session()
+    value = dbgems_module.spark
     assert isinstance(value, pyspark.sql.SparkSession), f"Expected {pyspark.sql.SparkSession}, found {type(value)}"
 
-    value = get_session_context()
+    value = dbgems_module.sc
     assert isinstance(value, pyspark.context.SparkContext), f"Expected {pyspark.context.SparkContext}, found {type(value)}"
 
     value = get_parameter("some_widget", default_value="undefined")
@@ -271,12 +276,7 @@ def proof_of_life(expected_get_username,
     assert value is not None, f"Expected not-None."
 
     if not includes_dbrest:
-        print(f"*" * 80)
-        print(f"* DEPENDENCY ERROR")
-        print(f"* The methods get_current_spark_version(), get_current_instance_pool_id(),")
-        print(f"* and get_current_node_type_id() require inclusion of the dbacademy_rest libraries")
-        print(f"*" * 80)
-        print()
+        print_deprecation_warning(title="DEPENDENCY ERROR", message="The methods get_current_spark_version(), get_current_instance_pool_id() and get_current_node_type_id() require inclusion of the dbacademy_rest libraries")
     else:
         value = get_current_spark_version()
         assert value == expected_get_current_spark_version, f"Expected \"{expected_get_current_spark_version}\", found \"{value}\"."
@@ -310,3 +310,6 @@ def display(html) -> None:
             return function(html)
         caller_frame = caller_frame.f_back
     raise ValueError("display not found in any caller frames.")
+
+
+__init_globals()

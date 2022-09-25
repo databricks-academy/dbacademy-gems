@@ -8,7 +8,7 @@ class MyTestCase(unittest.TestCase):
         import dbacademy_gems.dbgems
         from inspect import getmembers
 
-        expected_members = ['get_browser_host_name', 'get_cloud', 'get_current_instance_pool_id', 'get_current_node_type_id', 'get_current_spark_version', 'get_dbutils', 'get_job_id', 'get_notebook_dir', 'get_notebook_name', 'get_notebook_path', 'get_notebooks_api_endpoint', 'get_notebooks_api_token', 'get_parameter', 'get_session_context', 'get_spark_session', 'get_tag', 'get_tags', 'get_username', 'get_workspace_id', 'is_job', 'proof_of_life']
+        expected_members = ['get_browser_host_name', 'get_cloud', 'get_current_instance_pool_id', 'get_current_node_type_id', 'get_current_spark_version', 'get_dbutils', 'get_job_id', 'get_notebook_dir', 'get_notebook_name', 'get_notebook_path', 'get_notebooks_api_endpoint', 'get_notebooks_api_token', 'get_parameter', 'get_session_context', 'get_spark_session', 'get_tag', 'get_tags', 'get_username', 'get_workspace_id', 'is_job', 'proof_of_life', 'deprecation_logging_enabled', 'print_warning']
 
         old_members = [t[0] for t in getmembers(dbacademy.dbgems) if not t[0].startswith("__")]
         new_members = [t[0] for t in getmembers(dbacademy_gems.dbgems) if not t[0].startswith("__")]
