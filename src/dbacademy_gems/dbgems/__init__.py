@@ -9,6 +9,8 @@ try:
 except:
     includes_dbrest = False
 
+print("Moo")
+
 # noinspection PyGlobalUndefined
 def __init():
     import sys, dbruntime
@@ -17,17 +19,19 @@ def __init():
     if __is_initialized: return
     else: __is_initialized = True
 
-    module = sys.modules[globals()['__name__']]
-
     global spark
     try: spark
     except NameError:
         spark = pyspark.sql.SparkSession.builder.getOrCreate()
 
+    sys.modules[globals()['__name__']].spark = spark
+
     global sc
     try: sc
     except NameError:
         sc = spark.sparkContext
+
+    sys.modules[globals()['__name__']].sc = sc
 
     global dbutils
     try:
@@ -38,7 +42,8 @@ def __init():
         else:
             import IPython
             dbutils = IPython.get_ipython().user_ns["dbutils"]
-    module.dbutils = dbutils
+
+    sys.modules[globals()['__name__']].dbutils = dbutils
 
 def deprecation_logging_enabled():
     import os
@@ -61,12 +66,6 @@ def deprecated(reason=None):
             return result
         return wrapper
     return decorator
-
-# def dbutils():  # -> dbruntime.dbutils.DBUtils:
-#     __init()
-#     # noinspection PyGlobalUndefined
-#     global dbutils
-#     return dbutils
 
 @deprecated(reason="Use dbgems.dbutils instead.")
 def get_dbutils():  # -> dbruntime.dbutils.DBUtils:
