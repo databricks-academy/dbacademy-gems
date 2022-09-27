@@ -46,7 +46,7 @@ def __init_globals():
     dbgems_module.dbutils = dbutils
 
 def deprecation_logging_enabled():
-    status = spark.conf.get("dbacademy.deprecation.printing", None)
+    status = spark.conf.get("dbacademy.deprecation.logging", None)
     return status is not None and status.lower() == "enabled"
 
 def print_warning(title: str, message: str, length: int = 80):
