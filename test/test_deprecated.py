@@ -2,7 +2,7 @@ import unittest
 
 def deprecation_logging_enabled():
     return True
-    # status = spark.conf.get("dbacademy.deprecation.printing", None)
+    # status = spark.conf.get("dbacademy.deprecation.logging", None)
     # return status is not None and status.lower() == "enabled"
 
 def print_warning(title: str, message: str, length: int = 80, include_trace=False):
