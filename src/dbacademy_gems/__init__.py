@@ -13,9 +13,9 @@ def find_global(target):
     raise ValueError("display not found in any caller frames.")
 
 
-__sc = find_global("sc")
-__spark = find_global("spark")
-__dbutils = find_global("dbutils")
+_sc = find_global("sc")
+_spark = find_global("spark")
+_dbutils = find_global("dbutils")
 
 
 def deprecated(reason=None):
@@ -62,8 +62,8 @@ class DBGems:
 
     @property
     def spark(self) -> Union[None, pyspark.sql.SparkSession]:
-        global __spark
-        return __spark
+        global _spark
+        return _spark
 
     @deprecated(reason="Use dbgems.spark instead.")
     def get_spark_session(self) -> pyspark.sql.SparkSession:
@@ -71,8 +71,8 @@ class DBGems:
 
     @property
     def sc(self) -> Union[None, pyspark.SparkContext]:
-        global __sc
-        return __sc
+        global _sc
+        return _sc
 
     @deprecated(reason="Use dbgems.sc instead.")
     def get_session_context(self) -> pyspark.context.SparkContext:
@@ -80,8 +80,8 @@ class DBGems:
 
     @property
     def dbutils(self) -> Union[None, MockDBUtils]:
-        global __dbutils
-        return __dbutils
+        global _dbutils
+        return _dbutils
 
     @deprecated(reason="Use dbgems.dbutils instead.")
     def get_dbutils(self) -> Union[None, MockDBUtils]:
