@@ -4,10 +4,7 @@ from typing import Union
 def find_global(target):
     import inspect
     caller_frame = inspect.currentframe().f_back
-    count = 0
     while caller_frame is not None:
-        count += 1
-        print(count)
         caller_globals = caller_frame.f_globals
         what = caller_globals.get(target)
         if what:
