@@ -1,9 +1,8 @@
 import pyspark
 from typing import Union
 
-def find_global(target):
+def find_global(real_dbgems, target):
     import inspect
-    global dbgems
     caller_frame = inspect.currentframe().f_back
 
     while caller_frame is not None:
@@ -13,14 +12,8 @@ def find_global(target):
             return what
         caller_frame = caller_frame.f_back
 
-    dbgems.print_warning(title="DEPENDENCY ERROR", message=f"Global attribute {target} not found in any caller frames.")
+    real_dbgems.print_warning(title="DEPENDENCY ERROR", message=f"Global attribute {target} not found in any caller frames.")
     return None
-
-
-_sc = find_global("sc")
-_spark = find_global("spark")
-_dbutils = find_global("dbutils")
-
 
 def deprecated(reason=None):
     def decorator(inner_function):
@@ -324,3 +317,7 @@ class DBGems:
 
 
 dbgems: DBGems = DBGems()
+
+_sc = find_global(dbgems, "sc")
+_spark = find_global(dbgems, "spark")
+_dbutils = find_global(dbgems, "dbutils")
