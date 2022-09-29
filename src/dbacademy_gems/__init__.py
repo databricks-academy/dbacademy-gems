@@ -1,23 +1,24 @@
 import pyspark
 from typing import Union
 
-try:
-    # noinspection PyGlobalUndefined
-    print(f"sc={type(sc)}")
-except NameError:
-    print(f"sc={None}")
+def find_global(target):
+    import inspect
+    caller_frame = inspect.currentframe().f_back
+    count = 0
+    while caller_frame is not None:
+        count += 1
+        print(count)
+        caller_globals = caller_frame.f_globals
+        what = caller_globals.get(target)
+        if what:
+            return what
+        caller_frame = caller_frame.f_back
+    raise ValueError("display not found in any caller frames.")
 
-try:
-    # noinspection PyGlobalUndefined
-    print(f"spark={type(spark)}")
-except NameError:
-    print(f"spark={None}")
 
-try:
-    # noinspection PyGlobalUndefined
-    print(f"dbutils={type(dbutils)}")
-except NameError:
-    print(f"dbutils={None}")
+__sc = find_global("sc")
+__spark = find_global("spark")
+__dbutils = find_global("dbutils")
 
 
 def deprecated(reason=None):
@@ -64,14 +65,8 @@ class DBGems:
 
     @property
     def spark(self) -> Union[None, pyspark.sql.SparkSession]:
-        # noinspection PyGlobalUndefined
-        global spark
-
-        try:
-            return spark
-        except NameError:
-            return spark
-            # spark = pyspark.sql.SparkSession.builder.getOrCreate()
+        global __spark
+        return __spark
 
     @deprecated(reason="Use dbgems.spark instead.")
     def get_spark_session(self) -> pyspark.sql.SparkSession:
@@ -79,14 +74,8 @@ class DBGems:
 
     @property
     def sc(self) -> Union[None, pyspark.SparkContext]:
-        # noinspection PyGlobalUndefined
-        global sc
-
-        try:
-            return sc
-        except NameError:
-            return None
-            # sc = spark.sparkContext
+        global __sc
+        return __sc
 
     @deprecated(reason="Use dbgems.sc instead.")
     def get_session_context(self) -> pyspark.context.SparkContext:
@@ -94,20 +83,8 @@ class DBGems:
 
     @property
     def dbutils(self) -> Union[None, MockDBUtils]:
-        # noinspection PyGlobalUndefined
-        global dbutils
-
-        try:
-            return dbutils
-        except NameError:
-            return None
-
-        # if spark.conf.get("spark.databricks.service.client.enabled") == "true":
-        #     import dbruntime
-        #     dbutils = dbruntime.dbutils.DBUtils(spark)
-        # else:
-        #     import IPython
-        #     dbutils = IPython.get_ipython().user_ns["dbutils"]
+        global __dbutils
+        return __dbutils
 
     @deprecated(reason="Use dbgems.dbutils instead.")
     def get_dbutils(self) -> Union[None, MockDBUtils]:
@@ -264,11 +241,11 @@ class DBGems:
         import dbruntime
         from py4j.java_collections import JavaMap
 
-        assert isinstance(self.dbutils, dbruntime.dbutils.DBUtils), f"Expected {dbruntime.dbutils.DBUtils}, found {type(value)}"
+        assert isinstance(self.dbutils, dbruntime.dbutils.DBUtils), f"Expected {dbruntime.dbutils.DBUtils}, found {type(self.dbutils)}"
 
-        assert isinstance(self.spark, pyspark.sql.SparkSession), f"Expected {pyspark.sql.SparkSession}, found {type(value)}"
+        assert isinstance(self.spark, pyspark.sql.SparkSession), f"Expected {pyspark.sql.SparkSession}, found {type(self.spark)}"
 
-        assert isinstance(self.spark, pyspark.context.SparkContext), f"Expected {pyspark.context.SparkContext}, found {type(value)}"
+        assert isinstance(self.sc, pyspark.context.SparkContext), f"Expected {pyspark.context.SparkContext}, found {type(self.sc)}"
 
         value = self.get_parameter("some_widget", default_value="undefined")
         assert value == "undefined", f"Expected \"undefined\", found \"{value}\"."
