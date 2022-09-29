@@ -1,6 +1,24 @@
 import pyspark
 from typing import Union
 
+try:
+    # noinspection PyGlobalUndefined
+    print(f"sc={type(sc)}")
+except NameError:
+    print(f"sc={None}")
+
+try:
+    # noinspection PyGlobalUndefined
+    print(f"spark={type(spark)}")
+except NameError:
+    print(f"spark={None}")
+
+try:
+    # noinspection PyGlobalUndefined
+    print(f"dbutils={type(dbutils)}")
+except NameError:
+    print(f"dbutils={None}")
+
 
 def deprecated(reason=None):
     def decorator(inner_function):
@@ -43,19 +61,6 @@ class DBGems:
             self.includes_dbrest = True
         except:
             self.includes_dbrest = False
-
-        # noinspection PyGlobalUndefined
-        global sc
-        print(type(sc))
-
-        # noinspection PyGlobalUndefined
-        global spark
-        print(type(spark))
-
-        # noinspection PyGlobalUndefined
-        global dbutils
-        print(type(dbutils))
-
 
     @property
     def spark(self) -> Union[None, pyspark.sql.SparkSession]:
