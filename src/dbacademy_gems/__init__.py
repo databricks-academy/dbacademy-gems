@@ -3,8 +3,9 @@ from typing import Union
 
 def find_global(target):
     import inspect
+    global dbgems
     caller_frame = inspect.currentframe().f_back
-    
+
     while caller_frame is not None:
         caller_globals = caller_frame.f_globals
         what = caller_globals.get(target)
@@ -12,7 +13,7 @@ def find_global(target):
             return what
         caller_frame = caller_frame.f_back
 
-    DBGems.print_warning(title="DEPENDENCY ERROR", message=f"Global attribute {target} not found in any caller frames.")
+    dbgems.print_warning(title="DEPENDENCY ERROR", message=f"Global attribute {target} not found in any caller frames.")
     return None
 
 
