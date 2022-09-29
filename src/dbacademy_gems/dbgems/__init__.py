@@ -1,4 +1,5 @@
 import sys, pyspark
+from typing import Union
 
 __is_initialized = False
 
@@ -21,28 +22,32 @@ def __init_globals():
     global spark
     try: spark
     except NameError:
-        spark = pyspark.sql.SparkSession.builder.getOrCreate()
-
+        spark: Union[None, pyspark.sql.SparkSession] = None
+        # spark = pyspark.sql.SparkSession.builder.getOrCreate()
     dbgems_module.spark = spark
 
     global sc
     try: sc
     except NameError:
-        sc = spark.sparkContext
-
+        sc: Union[None, pyspark.SparkContext] = None
+        # sc = spark.sparkContext
     dbgems_module.sc = sc
 
     global dbutils
     try:
         dbutils
     except NameError:
-        if spark.conf.get("spark.databricks.service.client.enabled") == "true":
-            import dbruntime
-            dbutils = dbruntime.dbutils.DBUtils(spark)
-        else:
-            import IPython
-            dbutils = IPython.get_ipython().user_ns["dbutils"]
+        class DBUtilsMock:
+            def __init__(self):
+                self.fs = None
 
+        dbutils: Union[None, DBUtilsMock] = None
+        # if spark.conf.get("spark.databricks.service.client.enabled") == "true":
+        #     import dbruntime
+        #     dbutils = dbruntime.dbutils.DBUtils(spark)
+        # else:
+        #     import IPython
+        #     dbutils = IPython.get_ipython().user_ns["dbutils"]
     dbgems_module.dbutils = dbutils
 
 def deprecation_logging_enabled():
@@ -319,8 +324,8 @@ def display(html) -> None:
     raise ValueError("display not found in any caller frames.")
 
 
-__init_globals()
+# __init_globals()
 
-sc = dbgems_module.sc
-spark = dbgems_module.spark
-dbutils = dbgems_module.dbutils
+# sc = dbgems_module.sc
+# spark = dbgems_module.spark
+# dbutils = dbgems_module.dbutils
