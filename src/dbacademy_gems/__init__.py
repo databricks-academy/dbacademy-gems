@@ -44,6 +44,19 @@ class DBGems:
         except:
             self.includes_dbrest = False
 
+        # noinspection PyGlobalUndefined
+        global sc
+        print(type(sc))
+
+        # noinspection PyGlobalUndefined
+        global spark
+        print(type(spark))
+
+        # noinspection PyGlobalUndefined
+        global dbutils
+        print(type(dbutils))
+
+
     @property
     def spark(self) -> Union[None, pyspark.sql.SparkSession]:
         # noinspection PyGlobalUndefined
@@ -246,14 +259,11 @@ class DBGems:
         import dbruntime
         from py4j.java_collections import JavaMap
 
-        value = self.dbutils
-        assert isinstance(value, dbruntime.dbutils.DBUtils), f"Expected {dbruntime.dbutils.DBUtils}, found {type(value)}"
+        assert isinstance(self.dbutils, dbruntime.dbutils.DBUtils), f"Expected {dbruntime.dbutils.DBUtils}, found {type(value)}"
 
-        value = self.spark
-        assert isinstance(value, pyspark.sql.SparkSession), f"Expected {pyspark.sql.SparkSession}, found {type(value)}"
+        assert isinstance(self.spark, pyspark.sql.SparkSession), f"Expected {pyspark.sql.SparkSession}, found {type(value)}"
 
-        value = self.sc
-        assert isinstance(value, pyspark.context.SparkContext), f"Expected {pyspark.context.SparkContext}, found {type(value)}"
+        assert isinstance(self.spark, pyspark.context.SparkContext), f"Expected {pyspark.context.SparkContext}, found {type(value)}"
 
         value = self.get_parameter("some_widget", default_value="undefined")
         assert value == "undefined", f"Expected \"undefined\", found \"{value}\"."
