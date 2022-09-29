@@ -1,7 +1,7 @@
 from dbacademy_gems import dbgems as other_dbgems
 
 if other_dbgems.deprecation_logging_enabled():
-    other_dbgems.print_warning(title="DEPRECATED", message=f"dbacademy.dbgems is deprecated, use other_dbgems instead.")
+    other_dbgems.print_warning(title="DEPRECATED", message=f"dbacademy.dbgems is deprecated, use dbacademy_gems.dbgems instead.")
 
 get_browser_host_name = other_dbgems.get_browser_host_name
 get_cloud = other_dbgems.get_cloud
