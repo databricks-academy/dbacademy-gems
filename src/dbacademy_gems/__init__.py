@@ -102,12 +102,11 @@ class DBGems:
     def sql(self, query):
         return self.spark.sql(query)
 
-    @staticmethod
-    def get_parameter(name, default_value=""):
+    def get_parameter(self, name, default_value=""):
         from py4j.protocol import Py4JJavaError
         try:
             # noinspection PyUnresolvedReferences
-            result = dbutils.widgets.get(name)
+            result = self.dbutils.widgets.get(name)
             return result or default_value
         except Py4JJavaError as ex:
             if "InputWidgetNotDefined" not in ex.java_exception.getClass().getName():
@@ -164,15 +163,11 @@ class DBGems:
     def get_notebook_dir(self, offset=-1) -> str:
         return "/".join(self.get_notebook_path().split("/")[:offset])
 
-    @staticmethod
-    def get_notebooks_api_endpoint() -> str:
-        # noinspection PyUnresolvedReferences
-        return dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiUrl().getOrElse(None)
+    def get_notebooks_api_endpoint(self) -> str:
+        return self.dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiUrl().getOrElse(None)
 
-    @staticmethod
-    def get_notebooks_api_token() -> str:
-        # noinspection PyUnresolvedReferences
-        return dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiToken().getOrElse(None)
+    def get_notebooks_api_token(self) -> str:
+        return self.dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiToken().getOrElse(None)
 
     @staticmethod
     def jprint(value: dict, indent: int = 4):
