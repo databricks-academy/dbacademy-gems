@@ -40,6 +40,12 @@ def __init_globals():
         class DBUtilsMock:
             def __init__(self):
                 self.fs = None
+                self.widgets = None
+                self.notebook = None
+
+            # noinspection PyPep8Naming
+            def displayHTML(self, **kwargs):
+                pass
 
         dbutils: Union[None, DBUtilsMock] = None
         # if spark.conf.get("spark.databricks.service.client.enabled") == "true":
