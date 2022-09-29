@@ -105,7 +105,6 @@ class DBGems:
     def get_parameter(self, name, default_value=""):
         from py4j.protocol import Py4JJavaError
         try:
-            # noinspection PyUnresolvedReferences
             result = self.dbutils.widgets.get(name)
             return result or default_value
         except Py4JJavaError as ex:
