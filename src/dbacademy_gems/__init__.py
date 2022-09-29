@@ -315,6 +315,9 @@ class DBGems:
             caller_frame = caller_frame.f_back
         raise ValueError("display not found in any caller frames.")
 
+    def deprecated(self, reason: str):
+        pass
+
 
 dbgems: DBGems = DBGems()
 dbgems.deprecated = deprecated
