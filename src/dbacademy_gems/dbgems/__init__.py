@@ -13,7 +13,6 @@ dbgems_module = sys.modules[globals()['__name__']]
 
 # noinspection PyGlobalUndefined
 def __init_globals():
-    import dbruntime
 
     global __is_initialized
     if __is_initialized: return
@@ -38,6 +37,7 @@ def __init_globals():
         dbutils
     except NameError:
         if spark.conf.get("spark.databricks.service.client.enabled") == "true":
+            import dbruntime
             dbutils = dbruntime.dbutils.DBUtils(spark)
         else:
             import IPython
