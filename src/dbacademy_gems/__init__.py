@@ -27,7 +27,7 @@ def deprecated(reason=None):
                 try:
                     import inspect
                     function_name = str(inner_function.__name__) + str(inspect.signature(inner_function))
-                    final_reason = f"{reason}\n{function_name}"
+                    final_reason = f"From: {reason}\n{function_name}"
                 except:
                     final_reason = reason  # just in case
 
