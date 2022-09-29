@@ -10,7 +10,7 @@ def find_global(target):
         if what:
             return what
         caller_frame = caller_frame.f_back
-    raise ValueError("display not found in any caller frames.")
+    raise ValueError(f"{target} not found in any caller frames.")
 
 
 _sc = find_global("sc")
