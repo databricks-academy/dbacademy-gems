@@ -317,6 +317,7 @@ class DBGems:
 
 
 dbgems: DBGems = DBGems()
+dbgems.deprecated = deprecated
 
 _sc = find_global(dbgems, "sc")
 _spark = find_global(dbgems, "spark")
