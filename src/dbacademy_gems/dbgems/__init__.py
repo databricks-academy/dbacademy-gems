@@ -237,12 +237,10 @@ def lookup_current_module_version(module: str, dist_version: str = "0.0.0", defa
     with open(path) as f:
         data = json.load(f)
         requested_revision = data.get("vcs_info", {}).get("requested_revision", None)
+        requested_revision = requested_revision or data.get("vcs_info", {}).get("commit_id", None)
+        requested_revision = requested_revision or default
 
-        if requested_revision is None:
-            requested_revision = data.get("vcs_info", {}).get("commit_id", None)
-
-        if requested_revision is None:
-            return default
+        return requested_revision
 
 def is_curriculum_workspace() -> bool:
     host_name = get_browser_host_name(default="unknown")
