@@ -1,6 +1,7 @@
 dbx
 py4j
 IPython
+requests
 pyspark==3.3.*
 
 #py4j

@@ -1,4 +1,5 @@
 import sys, pyspark
+from typing import List
 
 __is_initialized = False
 
@@ -128,12 +129,12 @@ def get_username() -> str:
     return get_tags()["user"]
 
 
-def get_browser_host_name():
-    return get_tags()["browserHostName"]
+def get_browser_host_name(default=None):
+    return get_tags().get("browserHostName", default=default)
 
 
-def get_job_id():
-    return get_tags()["jobId"]
+def get_job_id(default=None):
+    return get_tags().get("jobId", default=default)
 
 
 def is_job():
@@ -213,6 +214,51 @@ def get_current_node_type_id(client=None):
     else:
         raise Exception(f"Cannot use rest API with-out including dbacademy.dbrest")
 
+def sort_semantic_versions(versions: List[str]) -> List[str]:
+    versions.sort(key=lambda v: (int(v.split(".")[0]) * 10000) + (int(v.split(".")[1]) * 100) + int(v.split(".")[2]))
+    return versions
+
+def lookup_all_module_versions(module: str, github_org: str = "databricks-academy") -> List[str]:
+    import requests
+
+    response = requests.get(f"https://api.github.com/repos/{github_org}/{module}/tags")
+    assert response.status_code == 200, f"Expected HTTP 200, found {response.status_code}:\n{response.text}"
+
+    versions = [t.get("name")[1:] for t in response.json()]
+    return sort_semantic_versions(versions)
+
+def lookup_current_module_version(module: str, dist_version: str = "0.0.0", default: str = "v0.0.0") -> str:
+    import json, pkg_resources
+
+    name = module.replace("-", "_")
+    distribution = pkg_resources.get_distribution('dbacademy-gems')
+    path = f"{distribution.location}/{name}-{dist_version}.dist-info/direct_url.json"
+
+    with open(path) as f:
+        data = json.load(f)
+        return data.get("vcs_info", {}).get("requested_revision", default)
+
+def is_curriculum_workspace() -> bool:
+    host_name = get_browser_host_name(default="unknown")
+    return host_name.startswith("curriculum-") and host_name.endswith(".cloud.databricks.com")
+
+def check_for_latest_version(module: str, curriculum_workspaces_only=True) -> bool:
+    try:
+        if curriculum_workspaces_only is False or is_curriculum_workspace():
+            # Don't do anything unless this is in one of the Curriculum Workspaces
+            current_version = lookup_current_module_version("dbacademy-gems")[1:]
+            versions = lookup_all_module_versions("dbacademy-gems")
+
+            if current_version == versions[-1]:
+                return True  # They match, all done!
+
+            print_warning(title=f"Update Dependency: {module}",
+                          message=f"You are using version {current_version} but the latest version is {versions[-1]}.\n"+
+                                  f"Please update your dependencies on  the module \"{module}\" at your earliest convenience.")
+    except:
+        pass  # Bury any exceptions
+
+    return False
 
 # noinspection PyUnresolvedReferences
 def proof_of_life(expected_get_username,
@@ -283,7 +329,7 @@ def proof_of_life(expected_get_username,
     assert value is not None, f"Expected not-None."
 
     if not includes_dbrest:
-        print_deprecation_warning(title="DEPENDENCY ERROR", message="The methods get_current_spark_version(), get_current_instance_pool_id() and get_current_node_type_id() require inclusion of the dbacademy_rest libraries")
+        print_warning(title="DEPENDENCY ERROR", message="The methods get_current_spark_version(), get_current_instance_pool_id() and get_current_node_type_id() require inclusion of the dbacademy_rest libraries")
     else:
         value = get_current_spark_version()
         assert value == expected_get_current_spark_version, f"Expected \"{expected_get_current_spark_version}\", found \"{value}\"."
