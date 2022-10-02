@@ -10,7 +10,9 @@ def find_dbacademy_packages():
 
 setuptools.setup(
     name="dbacademy-gems",
-    version="0.1",
+    author="Databricks, Inc",
+    maintainer="Databricks Academy",
+    version="v0.0.0",
     package_dir={"": "src"},
     packages=find_dbacademy_packages()
 )
