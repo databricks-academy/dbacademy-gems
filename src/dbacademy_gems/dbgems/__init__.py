@@ -256,7 +256,7 @@ def check_for_latest_version(module: str, curriculum_workspaces_only=True) -> bo
             if current_version == versions[-1]:
                 return True  # They match, all done!
 
-            print_warning(title=f"Update Dependency: {module}",
+            print_warning(title=f"Outdated Dependency: {module}",
                           message=f"You are using version {current_version} but the latest version is {versions[-1]}.\n"+
                                   f"Please update your dependencies on  the module \"{module}\" at your earliest convenience.")
     except:
