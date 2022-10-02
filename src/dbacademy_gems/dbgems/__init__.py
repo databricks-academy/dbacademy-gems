@@ -231,7 +231,7 @@ def lookup_current_module_version(module: str, dist_version: str = "0.0.0", defa
     import json, pkg_resources
 
     name = module.replace("-", "_")
-    distribution = pkg_resources.get_distribution('dbacademy-gems')
+    distribution = pkg_resources.get_distribution(module)
     path = f"{distribution.location}/{name}-{dist_version}.dist-info/direct_url.json"
 
     with open(path) as f:
