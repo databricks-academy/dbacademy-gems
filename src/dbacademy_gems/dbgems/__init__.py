@@ -250,8 +250,8 @@ def check_for_latest_version(module: str, curriculum_workspaces_only=True) -> bo
     try:
         if curriculum_workspaces_only is False or is_curriculum_workspace():
             # Don't do anything unless this is in one of the Curriculum Workspaces
-            current_version = lookup_current_module_version("dbacademy-gems")[1:]
-            versions = lookup_all_module_versions("dbacademy-gems")
+            current_version = lookup_current_module_version(module)[1:]
+            versions = lookup_all_module_versions(module)
 
             if current_version == versions[-1]:
                 return True  # They match, all done!
