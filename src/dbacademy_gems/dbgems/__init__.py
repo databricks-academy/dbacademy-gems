@@ -247,8 +247,9 @@ def is_curriculum_workspace() -> bool:
     return host_name.startswith("curriculum-") and host_name.endswith(".cloud.databricks.com")
 
 def check_for_latest_version(module: str, curriculum_workspaces_only=True) -> bool:
+    testable = curriculum_workspaces_only is False or is_curriculum_workspace()
     try:
-        if curriculum_workspaces_only is False or is_curriculum_workspace():
+        if testable:
             # Don't do anything unless this is in one of the Curriculum Workspaces
             current_version = lookup_current_module_version(module)[1:]
             versions = lookup_all_module_versions(module)
@@ -259,8 +260,11 @@ def check_for_latest_version(module: str, curriculum_workspaces_only=True) -> bo
             print_warning(title=f"Outdated Dependency: {module}",
                           message=f"You are using version {current_version} but the latest version is {versions[-1]}.\n"+
                                   f"Please update your dependencies on  the module \"{module}\" at your earliest convenience.")
-    except:
-        pass  # Bury any exceptions
+    except Exception as e:
+        if testable:
+            raise e
+        else:
+            pass  # Bury the exception
 
     return False
 
