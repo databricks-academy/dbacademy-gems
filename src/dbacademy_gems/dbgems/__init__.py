@@ -252,9 +252,10 @@ def check_for_latest_version(module: str, curriculum_workspaces_only=True) -> bo
     try:
         if testable:
             current_version = lookup_current_module_version(module)
+            versions = lookup_all_module_versions(module)
+
             if current_version.startswith("v"):
                 # Starts with "v" when a true version, otherwise it's a branch or commit hash
-                versions = lookup_all_module_versions(module)
                 if current_version[1:] == versions[-1]:
                     return True  # They match, all done!
 
