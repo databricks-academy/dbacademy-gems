@@ -221,9 +221,8 @@ def sort_semantic_versions(versions: List[str]) -> List[str]:
 def lookup_all_module_versions(module: str, github_org: str = "databricks-academy") -> List[str]:
     import requests
 
-    response = requests.get(f"https://api.github.com/repos/{github_org}/{module}/tags")
-    if response.status_code == 403:
-        return ["v-1.-1.-1"]
+    response = requests.get(f"https://api.github.com/repos/{github_org}/{module}/tags", headers={"User-Agent": "Databricks Academy"})
+    if response.status_code == 403: return ["v-1.-1.-1"]  # We are being rate litmited.
 
     assert response.status_code == 200, f"Expected HTTP 200, found {response.status_code}:\n{response.text}"
 
