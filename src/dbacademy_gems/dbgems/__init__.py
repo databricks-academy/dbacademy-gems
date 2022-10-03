@@ -257,10 +257,11 @@ def check_for_latest_version(module: str, curriculum_workspaces_only=True) -> bo
             versions = lookup_all_module_versions(module)
 
             if len(versions) == 0:
+                print(f"** WARNING ** No versions found for {module}; Double check the spelling and try again.")
                 return False  # There are no versions to process
 
             elif len(versions) == 1 and versions[0] == "v0.0.0":
-                print("** WARNING: Cannot test version dependency; GitHub rate limit exceeded.")
+                print(f"** WARNING ** Cannot test version dependency for {module}; GitHub rate limit exceeded.")
                 return False  # We are being rate limited, just bury the message.
 
             elif current_version.startswith("v"):
