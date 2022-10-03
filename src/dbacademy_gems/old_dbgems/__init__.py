@@ -1,5 +1,5 @@
 import sys, pyspark
-from typing import Union
+from typing import Union, List
 
 __is_initialized = False
 
@@ -60,7 +60,7 @@ def deprecation_logging_enabled():
     status = spark.conf.get("dbacademy.deprecation.logging", None)
     return status is not None and status.lower() == "enabled"
 
-def print_warning(title: str, message: str, length: int = 80):
+def print_warning(title: str, message: str, length: int = 100):
     title_len = length - len(title) - 3
     print(f"""* {title.upper()} {("*"*title_len)}""")
     for line in message.split("\n"):
@@ -139,12 +139,12 @@ def get_username() -> str:
     return get_tags()["user"]
 
 
-def get_browser_host_name():
-    return get_tags()["browserHostName"]
+def get_browser_host_name(default_value=None):
+    return get_tag(tag_name="browserHostName", default_value=default_value)
 
 
-def get_job_id():
-    return get_tags()["jobId"]
+def get_job_id(default_value=None):
+    return get_tag("jobId", default_value=default_value)
 
 
 def is_job():
@@ -154,7 +154,6 @@ def is_job():
 def get_workspace_id() -> str:
     # noinspection PyUnresolvedReferences
     return dbutils.entry_point.getDbutils().notebook().getContext().workspaceId().getOrElse(None)
-
 
 def get_notebook_path() -> str:
     # noinspection PyUnresolvedReferences
@@ -224,6 +223,75 @@ def get_current_node_type_id(client=None):
     else:
         raise Exception(f"Cannot use rest API with-out including dbacademy.dbrest")
 
+def sort_semantic_versions(versions: List[str]) -> List[str]:
+    versions.sort(key=lambda v: (int(v.split(".")[0]) * 10000) + (int(v.split(".")[1]) * 100) + int(v.split(".")[2]))
+    return versions
+
+def lookup_all_module_versions(module: str, github_org: str = "databricks-academy") -> List[str]:
+    import requests
+
+    response = requests.get(f"https://api.github.com/repos/{github_org}/{module}/tags", headers={"User-Agent": "Databricks Academy"})
+    if response.status_code == 403: return ["v0.0.0"]  # We are being rate limited.
+
+    assert response.status_code == 200, f"Expected HTTP 200, found {response.status_code}:\n{response.text}"
+
+    versions = [t.get("name")[1:] for t in response.json()]
+    return sort_semantic_versions(versions)
+
+def lookup_current_module_version(module: str, dist_version: str = "0.0.0", default: str = "v0.0.0") -> str:
+    import json, pkg_resources
+
+    name = module.replace("-", "_")
+    distribution = pkg_resources.get_distribution(module)
+    path = f"{distribution.location}/{name}-{dist_version}.dist-info/direct_url.json"
+
+    with open(path) as f:
+        data = json.load(f)
+        requested_revision = data.get("vcs_info", {}).get("requested_revision", None)
+        requested_revision = requested_revision or data.get("vcs_info", {}).get("commit_id", None)
+        requested_revision = requested_revision or default
+
+        return requested_revision
+
+def is_curriculum_workspace() -> bool:
+    host_name = get_browser_host_name(default_value="unknown")
+    return host_name.startswith("curriculum-") and host_name.endswith(".cloud.databricks.com")
+
+def validate_dependencies(module: str, curriculum_workspaces_only=True) -> bool:
+    # Don't do anything unless this is in one of the Curriculum Workspaces
+    testable = curriculum_workspaces_only is False or is_curriculum_workspace()
+    try:
+        if testable:
+            current_version = lookup_current_module_version(module)
+            versions = lookup_all_module_versions(module)
+
+            if len(versions) == 0:
+                print(f"** WARNING ** No versions found for {module}; Double check the spelling and try again.")
+                return False  # There are no versions to process
+
+            elif len(versions) == 1 and versions[0] == "v0.0.0":
+                print(f"** WARNING ** Cannot test version dependency for {module}; GitHub rate limit exceeded.")
+                return False  # We are being rate limited, just bury the message.
+
+            elif current_version.startswith("v"):
+                # Starts with "v" when a true version, otherwise it's a branch or commit hash
+                if current_version[1:] == versions[-1]:
+                    return True  # They match, all done!
+
+                print_warning(title=f"Outdated Dependency",
+                              message=f"You are using version {current_version} but the latest version is {versions[-1]}.\n"+
+                                      f"Please update your dependencies on the module \"{module}\" at your earliest convenience.")
+            else:
+                print_warning(title=f"Invalid Dependency",
+                              message=f"You are using the branch or commit hash {current_version} but the latest version is {versions[-1]}.\n"+
+                                      f"Please update your dependencies on the module \"{module}\" at your earliest convenience.")
+    except Exception as e:
+        if testable:
+            raise e
+        else:
+            pass  # Bury the exception
+
+    return False
 
 # noinspection PyUnresolvedReferences
 def proof_of_life(expected_get_username,
@@ -294,7 +362,7 @@ def proof_of_life(expected_get_username,
     assert value is not None, f"Expected not-None."
 
     if not includes_dbrest:
-        print_deprecation_warning(title="DEPENDENCY ERROR", message="The methods get_current_spark_version(), get_current_instance_pool_id() and get_current_node_type_id() require inclusion of the dbacademy_rest libraries")
+        print_warning(title="DEPENDENCY ERROR", message="The methods get_current_spark_version(), get_current_instance_pool_id() and get_current_node_type_id() require inclusion of the dbacademy_rest libraries")
     else:
         value = get_current_spark_version()
         assert value == expected_get_current_spark_version, f"Expected \"{expected_get_current_spark_version}\", found \"{value}\"."
