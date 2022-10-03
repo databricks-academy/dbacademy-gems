@@ -222,6 +222,9 @@ def lookup_all_module_versions(module: str, github_org: str = "databricks-academ
     import requests
 
     response = requests.get(f"https://api.github.com/repos/{github_org}/{module}/tags")
+    if response.status_code == 403:
+        return ["v-1.-1.-1"]
+
     assert response.status_code == 200, f"Expected HTTP 200, found {response.status_code}:\n{response.text}"
 
     versions = [t.get("name")[1:] for t in response.json()]
