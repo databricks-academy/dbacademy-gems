@@ -129,12 +129,12 @@ def get_username() -> str:
     return get_tags()["user"]
 
 
-def get_browser_host_name(default=None):
-    return get_tags().get("browserHostName", default=default)
+def get_browser_host_name(default_value=None):
+    return get_tag(tag_name="browserHostName", default_value=default_value)
 
 
-def get_job_id(default=None):
-    return get_tags().get("jobId", default=default)
+def get_job_id(default_value=None):
+    return get_tag("jobId", default_value=default_value)
 
 
 def is_job():
@@ -144,7 +144,6 @@ def is_job():
 def get_workspace_id() -> str:
     # noinspection PyUnresolvedReferences
     return dbutils.entry_point.getDbutils().notebook().getContext().workspaceId().getOrElse(None)
-
 
 def get_notebook_path() -> str:
     # noinspection PyUnresolvedReferences
@@ -245,7 +244,7 @@ def lookup_current_module_version(module: str, dist_version: str = "0.0.0", defa
         return requested_revision
 
 def is_curriculum_workspace() -> bool:
-    host_name = get_browser_host_name(default="unknown")
+    host_name = get_browser_host_name(default_value="unknown")
     return host_name.startswith("curriculum-") and host_name.endswith(".cloud.databricks.com")
 
 def validate_dependencies(module: str, curriculum_workspaces_only=True) -> bool:
