@@ -12,8 +12,10 @@ except:
 
 dbgems_module = sys.modules[globals()['__name__']]
 
+
 # noinspection PyGlobalUndefined
 def __init_globals():
+    # noinspection PyUnresolvedReferences
     import dbruntime
 
     global __is_initialized
@@ -46,9 +48,11 @@ def __init_globals():
 
     dbgems_module.dbutils = dbutils
 
+
 def deprecation_logging_enabled():
     status = spark.conf.get("dbacademy.deprecation.logging", None)
     return status is not None and status.lower() == "enabled"
+
 
 def print_warning(title: str, message: str, length: int = 100):
     title_len = length - len(title) - 3
@@ -56,6 +60,7 @@ def print_warning(title: str, message: str, length: int = 100):
     for line in message.split("\n"):
         print(f"* {line}")
     print("*"*length)
+
 
 def deprecated(reason=None):
     def decorator(inner_function):
@@ -75,20 +80,25 @@ def deprecated(reason=None):
         return wrapper
     return decorator
 
+
 @deprecated(reason="Use dbgems.dbutils instead.")
 def get_dbutils():  # -> dbruntime.dbutils.DBUtils:
     return dbgems_module.dbutils
+
 
 @deprecated(reason="Use dbgems.spark instead.")
 def get_spark_session() -> pyspark.sql.SparkSession:
     return dbgems_module.spark
 
+
 @deprecated(reason="Use dbgems.sc instead.")
 def get_session_context() -> pyspark.context.SparkContext:
     return dbgems_module.sc
 
+
 def sql(query):
     return spark.sql(query)
+
 
 def get_parameter(name, default_value=""):
     from py4j.protocol import Py4JJavaError
@@ -101,6 +111,7 @@ def get_parameter(name, default_value=""):
             raise ex
         else:
             return default_value
+
 
 def get_cloud():
     with open("/databricks/common/conf/deploy.conf") as f:
@@ -147,6 +158,7 @@ def get_workspace_id() -> str:
     # noinspection PyUnresolvedReferences
     return dbutils.entry_point.getDbutils().notebook().getContext().workspaceId().getOrElse(None)
 
+
 def get_notebook_path() -> str:
     # noinspection PyUnresolvedReferences
     return dbutils.entry_point.getDbutils().notebook().getContext().notebookPath().getOrElse(None)
@@ -159,6 +171,7 @@ def get_notebook_name() -> str:
 def get_notebook_dir(offset=-1) -> str:
     return "/".join(get_notebook_path().split("/")[:offset])
 
+
 def get_notebooks_api_endpoint() -> str:
     # noinspection PyUnresolvedReferences
     return dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiUrl().getOrElse(None)
@@ -168,11 +181,13 @@ def get_notebooks_api_token() -> str:
     # noinspection PyUnresolvedReferences
     return dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiToken().getOrElse(None)
 
+
 def jprint(value: dict, indent: int = 4):
     assert type(value) == dict or type(value) == list, f"Expected value to be of type \"dict\" or \"list\", found \"{type(value)}\"."
 
     import json
     print(json.dumps(value, indent=indent))
+
 
 @deprecated(reason="Use dbacademy.dbrest.clusters.get_current_spark_version() instead.")
 def get_current_spark_version(client=None):
@@ -186,6 +201,7 @@ def get_current_spark_version(client=None):
 
     else:
         raise Exception(f"Cannot use rest API with-out including dbacademy.dbrest")
+
 
 @deprecated(reason="Use dbacademy.dbrest.clusters.get_current_instance_pool_id() instead.")
 def get_current_instance_pool_id(client=None):
@@ -215,9 +231,11 @@ def get_current_node_type_id(client=None):
     else:
         raise Exception(f"Cannot use rest API with-out including dbacademy.dbrest")
 
+
 def sort_semantic_versions(versions: List[str]) -> List[str]:
     versions.sort(key=lambda v: (int(v.split(".")[0]) * 10000) + (int(v.split(".")[1]) * 100) + int(v.split(".")[2]))
     return versions
+
 
 def lookup_all_module_versions(module: str, github_org: str = "databricks-academy") -> List[str]:
     import requests
@@ -229,6 +247,7 @@ def lookup_all_module_versions(module: str, github_org: str = "databricks-academ
 
     versions = [t.get("name")[1:] for t in response.json()]
     return sort_semantic_versions(versions)
+
 
 def lookup_current_module_version(module: str, dist_version: str = "0.0.0", default: str = "v0.0.0") -> str:
     import json, pkg_resources
@@ -245,9 +264,11 @@ def lookup_current_module_version(module: str, dist_version: str = "0.0.0", defa
 
         return requested_revision
 
+
 def is_curriculum_workspace() -> bool:
     host_name = get_browser_host_name(default_value="unknown")
     return host_name.startswith("curriculum-") and host_name.endswith(".cloud.databricks.com")
+
 
 def validate_dependencies(module: str, curriculum_workspaces_only=True) -> bool:
     # Don't do anything unless this is in one of the Curriculum Workspaces
@@ -271,11 +292,11 @@ def validate_dependencies(module: str, curriculum_workspaces_only=True) -> bool:
                     return True  # They match, all done!
 
                 print_warning(title=f"Outdated Dependency",
-                              message=f"You are using version {current_version} but the latest version is {versions[-1]}.\n"+
+                              message=f"You are using version \"{current_version}\" but the latest version is \"{versions[-1]}\".\n" +
                                       f"Please update your dependencies on the module \"{module}\" at your earliest convenience.")
             else:
                 print_warning(title=f"Invalid Dependency",
-                              message=f"You are using the branch or commit hash {current_version} but the latest version is {versions[-1]}.\n"+
+                              message=f"You are using the branch or commit hash \"{current_version}\" but the latest version is \"{versions[-1]}\".\n" +
                                       f"Please update your dependencies on the module \"{module}\" at your earliest convenience.")
     except Exception as e:
         if testable:
@@ -284,6 +305,7 @@ def validate_dependencies(module: str, curriculum_workspaces_only=True) -> bool:
             pass  # Bury the exception
 
     return False
+
 
 # noinspection PyUnresolvedReferences
 def proof_of_life(expected_get_username,
@@ -367,6 +389,7 @@ def proof_of_life(expected_get_username,
 
     print("All tests passed!")
 
+
 def display_html(html) -> None:
     import inspect
     caller_frame = inspect.currentframe().f_back
@@ -377,6 +400,7 @@ def display_html(html) -> None:
             return function(html)
         caller_frame = caller_frame.f_back
     raise ValueError("displayHTML not found in any caller frames.")
+
 
 def display(html) -> None:
     import inspect
