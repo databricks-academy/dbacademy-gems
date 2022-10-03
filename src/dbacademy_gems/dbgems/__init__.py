@@ -50,7 +50,7 @@ def deprecation_logging_enabled():
     status = spark.conf.get("dbacademy.deprecation.logging", None)
     return status is not None and status.lower() == "enabled"
 
-def print_warning(title: str, message: str, length: int = 80):
+def print_warning(title: str, message: str, length: int = 100):
     title_len = length - len(title) - 3
     print(f"""* {title.upper()} {("*"*title_len)}""")
     for line in message.split("\n"):
