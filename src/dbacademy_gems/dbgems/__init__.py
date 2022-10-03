@@ -248,7 +248,7 @@ def is_curriculum_workspace() -> bool:
     host_name = get_browser_host_name(default="unknown")
     return host_name.startswith("curriculum-") and host_name.endswith(".cloud.databricks.com")
 
-def check_for_latest_version(module: str, curriculum_workspaces_only=True) -> bool:
+def validate_dependencies(module: str, curriculum_workspaces_only=True) -> bool:
     # Don't do anything unless this is in one of the Curriculum Workspaces
     testable = curriculum_workspaces_only is False or is_curriculum_workspace()
     try:
