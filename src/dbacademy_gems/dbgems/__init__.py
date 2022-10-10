@@ -433,6 +433,11 @@ def generating_docs() -> bool:
     return str(value).lower() == "true"
 
 
+def stable_hash(*args, length=4):
+    import hashlib
+    return hashlib.md5(":".join(args).encode("utf-8")).hexdigest()[-length:]
+
+
 __init_globals()
 
 sc = dbgems_module.sc
