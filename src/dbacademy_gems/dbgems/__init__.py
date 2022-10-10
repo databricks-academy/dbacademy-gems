@@ -1,5 +1,5 @@
 import sys, pyspark
-from typing import List
+from typing import List, Union, Any
 
 __is_initialized = False
 
@@ -100,12 +100,17 @@ def sql(query):
     return spark.sql(query)
 
 
-def get_parameter(name, default_value=""):
+def get_parameter(name: str, default_value: Any = "") -> Union[None, str]:
     from py4j.protocol import Py4JJavaError
     try:
-        # noinspection PyUnresolvedReferences
+        if default_value is not None and type(default_value) != str:
+            default_value = str(default_value)
+
         result = dbutils.widgets.get(name)
-        return result or default_value
+        return_value = result or default_value
+
+        return None if return_value is None else str(return_value)
+
     except Py4JJavaError as ex:
         if "InputWidgetNotDefined" not in ex.java_exception.getClass().getName():
             raise ex
@@ -418,6 +423,14 @@ def display(html) -> None:
             return function(html)
         caller_frame = caller_frame.f_back
     raise ValueError("display not found in any caller frames.")
+
+
+GENERATING_DOCS = "generating_docs"
+
+
+def generating_docs() -> bool:
+    value = get_parameter(GENERATING_DOCS, False)
+    return str(value).lower() == "true"
 
 
 __init_globals()
