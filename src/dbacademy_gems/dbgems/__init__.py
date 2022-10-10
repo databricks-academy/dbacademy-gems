@@ -433,7 +433,7 @@ def is_generating_docs() -> bool:
     return str(value).lower() == "true"
 
 
-def stable_hash(*args, length):
+def stable_hash(*args, length: int) -> str:
     import hashlib
     data = ":".join(args).encode("utf-8")
     value = int(hashlib.md5(data).hexdigest(), 16)
