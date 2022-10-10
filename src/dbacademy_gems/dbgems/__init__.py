@@ -433,9 +433,16 @@ def is_generating_docs() -> bool:
     return str(value).lower() == "true"
 
 
-def stable_hash(*args, length=4):
+def stable_hash(*args, length):
     import hashlib
-    return hashlib.md5(":".join(args).encode("utf-8")).hexdigest()[-length:]
+    data = ":".join(args).encode("utf-8")
+    value = int(hashlib.md5(data).hexdigest(), 16)
+    numerals = "0123456789abcdefghijklmnopqrstuvwxyz"
+    result = []
+    for i in range(length):
+        result += numerals[value % 36]
+        value //= 36
+    return "".join(result)
 
 
 __init_globals()
