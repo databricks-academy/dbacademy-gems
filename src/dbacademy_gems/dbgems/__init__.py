@@ -134,8 +134,14 @@ def get_tags():
 
 
 def get_tag(tag_name: str, default_value: str = None) -> str:
-    value = get_tags().get(tag_name)
-    return value or default_value
+    try:
+        value = get_tags().get(tag_name)
+        return value or default_value
+    except Exception as e:
+        if "CommandContext.tags() is not whitelisted" in str(e):
+            return default_value
+        else:
+            raise e
 
 
 def get_username() -> str:
