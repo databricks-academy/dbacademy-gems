@@ -428,7 +428,7 @@ def display(html) -> None:
 GENERATING_DOCS = "generating_docs"
 
 
-def generating_docs() -> bool:
+def is_generating_docs() -> bool:
     value = get_parameter(GENERATING_DOCS, False)
     return str(value).lower() == "true"
 
