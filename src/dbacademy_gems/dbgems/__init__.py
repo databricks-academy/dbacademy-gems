@@ -187,6 +187,10 @@ def get_notebooks_api_endpoint() -> str:
     # noinspection PyUnresolvedReferences
     return dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiUrl().getOrElse(None)
 
+def get_workspace_url() -> str:
+    # workspace url may be different from api endpoint  
+    return sc.getConf().get('spark.databricks.workspaceUrl')
+
 
 def get_notebooks_api_token() -> str:
     # noinspection PyUnresolvedReferences
