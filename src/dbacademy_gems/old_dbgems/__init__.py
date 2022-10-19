@@ -1,5 +1,5 @@
 import sys, pyspark
-from typing import Union, List
+from typing import List, Union, Any
 
 __is_initialized = False
 
@@ -12,8 +12,11 @@ except:
 
 dbgems_module = sys.modules[globals()['__name__']]
 
+
 # noinspection PyGlobalUndefined
 def __init_globals():
+    # noinspection PyUnresolvedReferences
+    import dbruntime
 
     global __is_initialized
     if __is_initialized: return
@@ -56,9 +59,11 @@ def __init_globals():
         #     dbutils = IPython.get_ipython().user_ns["dbutils"]
     dbgems_module.dbutils = dbutils
 
+
 def deprecation_logging_enabled():
     status = spark.conf.get("dbacademy.deprecation.logging", None)
     return status is not None and status.lower() == "enabled"
+
 
 def print_warning(title: str, message: str, length: int = 100):
     title_len = length - len(title) - 3
@@ -66,6 +71,7 @@ def print_warning(title: str, message: str, length: int = 100):
     for line in message.split("\n"):
         print(f"* {line}")
     print("*"*length)
+
 
 def deprecated(reason=None):
     def decorator(inner_function):
@@ -85,32 +91,43 @@ def deprecated(reason=None):
         return wrapper
     return decorator
 
+
 @deprecated(reason="Use dbgems.dbutils instead.")
 def get_dbutils():  # -> dbruntime.dbutils.DBUtils:
     return dbgems_module.dbutils
+
 
 @deprecated(reason="Use dbgems.spark instead.")
 def get_spark_session() -> pyspark.sql.SparkSession:
     return dbgems_module.spark
 
+
 @deprecated(reason="Use dbgems.sc instead.")
 def get_session_context() -> pyspark.context.SparkContext:
     return dbgems_module.sc
 
+
 def sql(query):
     return spark.sql(query)
 
-def get_parameter(name, default_value=""):
+
+def get_parameter(name: str, default_value: Any = "") -> Union[None, str]:
     from py4j.protocol import Py4JJavaError
     try:
-        # noinspection PyUnresolvedReferences
+        if default_value is not None and type(default_value) != str:
+            default_value = str(default_value)
+
         result = dbutils.widgets.get(name)
-        return result or default_value
+        return_value = result or default_value
+
+        return None if return_value is None else str(return_value)
+
     except Py4JJavaError as ex:
         if "InputWidgetNotDefined" not in ex.java_exception.getClass().getName():
             raise ex
         else:
             return default_value
+
 
 def get_cloud():
     with open("/databricks/common/conf/deploy.conf") as f:
@@ -125,18 +142,26 @@ def get_cloud():
     raise Exception("Unable to identify the cloud provider.")
 
 
-def get_tags() -> dict:
+def get_tags():
+    tags = dbutils.entry_point.getDbutils().notebook().getContext().tags()
     # noinspection PyProtectedMember,PyUnresolvedReferences
-    return sc._jvm.scala.collection.JavaConversions.mapAsJavaMap(
-        dbutils.entry_point.getDbutils().notebook().getContext().tags())
+    java_map = sc._jvm.scala.collection.JavaConversions.mapAsJavaMap(tags)
+    return java_map
 
 
 def get_tag(tag_name: str, default_value: str = None) -> str:
-    return get_tags().get(tag_name, default_value)
+    try:
+        value = get_tags().get(tag_name)
+        return value or default_value
+    except Exception as e:
+        if "CommandContext.tags() is not whitelisted" in str(e):
+            return default_value
+        else:
+            raise e
 
 
 def get_username() -> str:
-    return get_tags()["user"]
+    return get_tag("user")
 
 
 def get_browser_host_name(default_value=None):
@@ -144,7 +169,7 @@ def get_browser_host_name(default_value=None):
 
 
 def get_job_id(default_value=None):
-    return get_tag("jobId", default_value=default_value)
+    return get_tag(tag_name="jobId", default_value=default_value)
 
 
 def is_job():
@@ -154,6 +179,7 @@ def is_job():
 def get_workspace_id() -> str:
     # noinspection PyUnresolvedReferences
     return dbutils.entry_point.getDbutils().notebook().getContext().workspaceId().getOrElse(None)
+
 
 def get_notebook_path() -> str:
     # noinspection PyUnresolvedReferences
@@ -167,14 +193,21 @@ def get_notebook_name() -> str:
 def get_notebook_dir(offset=-1) -> str:
     return "/".join(get_notebook_path().split("/")[:offset])
 
+
 def get_notebooks_api_endpoint() -> str:
     # noinspection PyUnresolvedReferences
     return dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiUrl().getOrElse(None)
 
 
+def get_workspace_url() -> str:
+    # workspace url may be different from api endpoint  
+    return sc.getConf().get('spark.databricks.workspaceUrl')
+
+
 def get_notebooks_api_token() -> str:
     # noinspection PyUnresolvedReferences
     return dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiToken().getOrElse(None)
+
 
 def jprint(value: dict, indent: int = 4):
     assert type(value) == dict or type(value) == list, f"Expected value to be of type \"dict\" or \"list\", found \"{type(value)}\"."
@@ -182,12 +215,13 @@ def jprint(value: dict, indent: int = 4):
     import json
     print(json.dumps(value, indent=indent))
 
+
 @deprecated(reason="Use dbacademy.dbrest.clusters.get_current_spark_version() instead.")
 def get_current_spark_version(client=None):
     if includes_dbrest:
         # noinspection PyUnresolvedReferences
         from dbacademy import dbrest
-        cluster_id = get_tags()["clusterId"]
+        cluster_id = get_tag("clusterId")
         client = dbrest.DBAcademyRestClient() if client is None else client
         cluster = client.clusters().get(cluster_id)
         return cluster.get("spark_version", None)
@@ -195,12 +229,13 @@ def get_current_spark_version(client=None):
     else:
         raise Exception(f"Cannot use rest API with-out including dbacademy.dbrest")
 
+
 @deprecated(reason="Use dbacademy.dbrest.clusters.get_current_instance_pool_id() instead.")
 def get_current_instance_pool_id(client=None):
     if includes_dbrest:
         # noinspection PyUnresolvedReferences
         from dbacademy import dbrest
-        cluster_id = get_tags()["clusterId"]
+        cluster_id = get_tag("clusterId")
         client = dbrest.DBAcademyRestClient() if client is None else client
         cluster = client.clusters().get(cluster_id)
         return cluster.get("instance_pool_id", None)
@@ -215,7 +250,7 @@ def get_current_node_type_id(client=None):
     if includes_dbrest:
         # noinspection PyUnresolvedReferences
         from dbacademy import dbrest
-        cluster_id = get_tags()["clusterId"]
+        cluster_id = get_tag("clusterId")
         client = dbrest.DBAcademyRestClient() if client is None else client
         cluster = client.clusters().get(cluster_id)
         return cluster.get("node_type_id", None)
@@ -223,9 +258,11 @@ def get_current_node_type_id(client=None):
     else:
         raise Exception(f"Cannot use rest API with-out including dbacademy.dbrest")
 
+
 def sort_semantic_versions(versions: List[str]) -> List[str]:
     versions.sort(key=lambda v: (int(v.split(".")[0]) * 10000) + (int(v.split(".")[1]) * 100) + int(v.split(".")[2]))
     return versions
+
 
 def lookup_all_module_versions(module: str, github_org: str = "databricks-academy") -> List[str]:
     import requests
@@ -237,6 +274,7 @@ def lookup_all_module_versions(module: str, github_org: str = "databricks-academ
 
     versions = [t.get("name")[1:] for t in response.json()]
     return sort_semantic_versions(versions)
+
 
 def lookup_current_module_version(module: str, dist_version: str = "0.0.0", default: str = "v0.0.0") -> str:
     import json, pkg_resources
@@ -253,9 +291,11 @@ def lookup_current_module_version(module: str, dist_version: str = "0.0.0", defa
 
         return requested_revision
 
+
 def is_curriculum_workspace() -> bool:
     host_name = get_browser_host_name(default_value="unknown")
     return host_name.startswith("curriculum-") and host_name.endswith(".cloud.databricks.com")
+
 
 def validate_dependencies(module: str, curriculum_workspaces_only=True) -> bool:
     # Don't do anything unless this is in one of the Curriculum Workspaces
@@ -279,11 +319,11 @@ def validate_dependencies(module: str, curriculum_workspaces_only=True) -> bool:
                     return True  # They match, all done!
 
                 print_warning(title=f"Outdated Dependency",
-                              message=f"You are using version {current_version} but the latest version is {versions[-1]}.\n"+
+                              message=f"You are using version \"{current_version}\" but the latest version is \"{versions[-1]}\".\n" +
                                       f"Please update your dependencies on the module \"{module}\" at your earliest convenience.")
             else:
                 print_warning(title=f"Invalid Dependency",
-                              message=f"You are using the branch or commit hash {current_version} but the latest version is {versions[-1]}.\n"+
+                              message=f"You are using the branch or commit hash \"{current_version}\" but the latest version is \"{versions[-1]}\".\n" +
                                       f"Please update your dependencies on the module \"{module}\" at your earliest convenience.")
     except Exception as e:
         if testable:
@@ -292,6 +332,7 @@ def validate_dependencies(module: str, curriculum_workspaces_only=True) -> bool:
             pass  # Bury the exception
 
     return False
+
 
 # noinspection PyUnresolvedReferences
 def proof_of_life(expected_get_username,
@@ -375,6 +416,7 @@ def proof_of_life(expected_get_username,
 
     print("All tests passed!")
 
+
 def display_html(html) -> None:
     import inspect
     caller_frame = inspect.currentframe().f_back
@@ -385,6 +427,7 @@ def display_html(html) -> None:
             return function(html)
         caller_frame = caller_frame.f_back
     raise ValueError("displayHTML not found in any caller frames.")
+
 
 def display(html) -> None:
     import inspect
@@ -398,7 +441,27 @@ def display(html) -> None:
     raise ValueError("display not found in any caller frames.")
 
 
-# __init_globals()
+GENERATING_DOCS = "generating_docs"
+
+
+def is_generating_docs() -> bool:
+    value = get_parameter(GENERATING_DOCS, False)
+    return str(value).lower() == "true"
+
+
+def stable_hash(*args, length: int) -> str:
+    import hashlib
+    data = ":".join(args).encode("utf-8")
+    value = int(hashlib.md5(data).hexdigest(), 16)
+    numerals = "0123456789abcdefghijklmnopqrstuvwxyz"
+    result = []
+    for i in range(length):
+        result += numerals[value % 36]
+        value //= 36
+    return "".join(result)
+
+
+__init_globals()
 
 # sc = dbgems_module.sc
 # spark = dbgems_module.spark
